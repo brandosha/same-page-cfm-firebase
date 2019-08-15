@@ -7,9 +7,8 @@ const functions = require('firebase-functions');
 //  response.send("Hello from Firebase!");
 // });
 
-
 exports.sendMessage = functions.https.onRequest((request, response) => {
-    var body = request.query
+    var body = JSON.stringify(request.query)
     console.log(body)
     response.end()
 })
