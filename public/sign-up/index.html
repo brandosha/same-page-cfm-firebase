@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign Up</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/6.3.5/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/6.3.5/firebase-auth.js"></script>
+    <script defer src="/__/firebase/6.3.5/firebase-firestore.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+  <body>
+    <form @submit.prevent="handleFormSubmit" id="sign-up-form" class="py-3 container">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input 
+          type="text"
+          v-model.trim="nameInput.value"
+          class="form-control"
+          :class="nameInput.classes"
+          id="name"
+          name="name"
+          autocomplete="name"
+        >
+        <div class="invalid-feedback">{{ nameInput.error }}</div>
+        <div class="-valid-feedback"><br></div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="text"
+          v-model.trim="emailInput.value"
+          class="form-control"
+          :class="emailInput.classes"
+          id="email"
+          name="email"
+          autocomplete="email"
+        >
+        <div class="invalid-feedback">{{ emailInput.error }}</div>
+        <div class="-valid-feedback"><br></div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password"
+          v-model="passwordInput.value"
+          class="form-control"
+          :class="passwordInput.classes"
+          id="password"
+          name="password"
+          autocomplete="new-password"
+        >
+        <div class="invalid-feedback">{{ passwordInput.error }}</div>
+        <div class="-valid-feedback"><br></div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Re-enter Password</label>
+        <input 
+          type="password"
+          v-model="confirmPasswordInput.value"
+          class="form-control"
+          :class="confirmPasswordInput.classes"
+          id="confirm-password"
+          autocomplete="new-password"
+        >
+        <div class="invalid-feedback">{{ confirmPasswordInput.error }}</div>
+        <div class="-valid-feedback"><br></div>
+      </div>
+      
+      <div class="row">
+        <div class="mx-auto w-50">
+            <input type="submit" value="Sign Up" class="btn btn-success w-100">
+        </div>
+      </div>
+    </form>
+
+    <script defer src="main.js"></script>
+  </body>
+</html>
