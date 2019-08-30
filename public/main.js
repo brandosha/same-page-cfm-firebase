@@ -15,6 +15,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
 
         var db = firebase.database()
+
+        firebase.functions().useFunctionsEmulator('http://localhost:5001')
+        const searchEmailAddress = firebase.functions().httpsCallable('searchEmailAddress')
+        searchEmailAddress({groupId: '3krjATsDRvlJ6G6JLxq4', emailAddress: 'b@a.aa'})
+            .then(result => {
+                console.log(result)
+            })
+            .catch(error => {
+                console.error(error)
+            })
     } catch (e) {
         console.error(e);
         document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
