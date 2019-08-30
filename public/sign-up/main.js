@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if (user !== null && !signUpForm.formSubmitted) {
             window.location.replace('/home')
+        } else {
+            loading.hide()
         }
 
         if (user === null) return
@@ -16,6 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         window.location.href = '/home'
     })
+})
+
+var loading = new Vue({
+    el: '#loading',
+    methods: {
+        hide: function() {
+            $('#loading').hide()
+        },
+        show: function() {
+            $('#loading').show()
+        }
+    }
 })
 
 var signUpForm = new Vue({
