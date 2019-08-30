@@ -93,8 +93,10 @@ var signUpForm = new Vue({
 
             if (!formValid) return
 
+            loading.show()
             auth.createUserWithEmailAndPassword(this.emailInput.value, this.passwordInput.value)
                 .catch(error => {
+                    loading.hide()
                     if (error.code == 'auth/invalid-email') {
                         this.emailInput.isValid = false
                         this.emailInput.error = 'Enter a valid email'
