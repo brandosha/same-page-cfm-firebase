@@ -12,10 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (user === null) return
         db.collection('users').doc(user.uid).set({
-            name: signUpForm.nameInput.value,
-            dateCreated: new Date()
+            avatar: null,
+            dateCreated: new Date(),
+            name: signUpForm.nameInput.value
         })
         .then(() => {
+            user.sendEmailVerification()
             window.location.href = '/home'
         })
     })
