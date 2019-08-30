@@ -15,8 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
             name: signUpForm.nameInput.value,
             dateCreated: new Date()
         })
-
-        window.location.href = '/home'
+        .then(() => {
+            window.location.href = '/home'
+        })
     })
 })
 
