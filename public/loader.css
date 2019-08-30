@@ -1,0 +1,45 @@
+:root {
+  --loader-size: 30px;
+}
+
+.loader-container {
+  height: calc(var(--loader-size) + 8px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-container > div {
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  margin: 0 1.5px;
+  background-color: royalblue;
+  
+  animation: expand 2.5s ease-in-out infinite;
+}
+
+@keyframes expand {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+  50% {
+    width: var(--loader-size);
+    height: var(--loader-size);
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+}
+
+.loader-container > .d1 { animation-delay: 0s; }
+.loader-container > .d2 { animation-delay: 0.5s; }
+.loader-container > .d3 { animation-delay: 1s; }
+.loader-container > .d4 { animation-delay: 1.5s; }
+.loader-container > .d5 { animation-delay: 2s; }
