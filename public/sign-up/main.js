@@ -6,11 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if (user !== null && !signUpForm.formSubmitted) {
             window.location.replace('/home')
-        } else {
-            loading.hide()
         }
 
-        if (user === null) return
+        if (user === null) {
+            loading.hide()
+            return
+        }
         db.collection('users').doc(user.uid).set({
             avatar: null,
             dateCreated: new Date(),
