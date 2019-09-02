@@ -5,8 +5,20 @@ service cloud.firestore {
     	allow read, write: if false
     }
     
-    match /groups/{groupId}/{p=**} {
-      allow read, write: if exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+    function isMemberOfGroup(groupId) {
+    	return exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid))
+    }
+    function isManagerOfGroup(groupId) {
+    	return get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.manager == true
+    }
+    
+    match /groups/{groupId}/messages/{messageId} {
+      allow get, create: if isMemberOfGroup(groupId)
+      allow delete: if isMemberOfGroup(groupId) && isManagerOfGroup(groupId)
+    }
+    
+    match /groups/{groupId}/users/{userId} {
+    	allow write: if isManagerOfGroup(groupId)
     }
     
     match /users/{userId} {
