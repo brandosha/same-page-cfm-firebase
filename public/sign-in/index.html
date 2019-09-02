@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign In</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/6.3.5/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/6.3.5/firebase-auth.js"></script>
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="/loader.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/loader.css">
+  </head>
+  <body>
+    <form @submit.prevent="handleFormSubmit" id="sign-up-form" class="py-3 container">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="text"
+          v-model.trim="email"
+          class="form-control"
+          id="email"
+          name="email"
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password"
+          v-model="password"
+          class="form-control"
+          id="password"
+          name="password"
+          autocomplete="new-password"
+        >
+      </div>
+
+      <div class="invalid-feedback" id="invalid-credentials">
+        No user matches that sign in
+      </div>
+      
+      <div class="row">
+        <div class="mx-auto w-50">
+            <input type="submit" value="Sign In" class="btn btn-success w-100">
+        </div>
+      </div>
+    </form>
+
+    <div id="loading">
+      <full-page-loader delays="54321"></full-page-loader>
+    </div>
+
+    <script defer src="main.js"></script>
+  </body>
+</html>
