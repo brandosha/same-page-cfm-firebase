@@ -28,8 +28,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         auth = firebase.auth()
         auth.signOut()
-
-        window.location.replace('/')
+        .then(result => {
+          window.location.replace('/')
+        })
     })
 
     var loading = new Vue({
