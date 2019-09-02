@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if (user !== null && !signUpForm.formSubmitted) {
             window.location.replace('/home')
+            return
         }
 
         if (user === null) {
