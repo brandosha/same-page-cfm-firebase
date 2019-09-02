@@ -1,8 +1,7 @@
 var auth
-var db
 document.addEventListener('DOMContentLoaded', () => {
     auth = firebase.auth()
-    db = firebase.firestore()
+    const db = firebase.firestore()
     auth.onAuthStateChanged(user => {
         if (user !== null && !signUpForm.formSubmitted) {
             window.location.replace('/home')
