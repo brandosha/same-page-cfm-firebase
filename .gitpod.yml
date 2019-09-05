@@ -4,3 +4,10 @@ vscode:
     - octref.vetur@0.22.2:KOvI2Xa9VX4Lga8ukQxS2A==
 tasks:
   - command: npm install -g firebase-tools
+  github:
+  prebuilds:
+    master: false
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addBadge: false
