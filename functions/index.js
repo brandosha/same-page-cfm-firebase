@@ -1,6 +1,14 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-admin.initializeApp();
+
+try {
+    var serviceAccount = require('../.firebase/admin-sdk-credentials.json');
+    // initialize app with service credentials here
+} catch (error) {
+    // no credentials found
+    console.error(error)
+    admin.initializeApp()
+}
 
 const firestore = admin.firestore()
 const auth = admin.auth()
