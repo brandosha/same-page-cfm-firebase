@@ -6,10 +6,10 @@ service cloud.firestore {
     }
     
     function isMemberOfGroup(groupId) {
-    	return exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid))
+    	return groupId in request.auth.token.groups
     }
     function isManagerOfGroup(groupId) {
-    	return get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.isManager == true
+    	return request.auth.token.groups[groupId].isManager == true
     }
     
   	match /groups/{groupId} {
@@ -18,12 +18,12 @@ service cloud.firestore {
     }
     
     match /groups/{groupId}/messages/{messageId} {
-      allow get, create: if isMemberOfGroup(groupId)
+      allow read, create: if isMemberOfGroup(groupId)
       allow delete: if resource.data.from == request.auth.uid || isManagerOfGroup(groupId)
     }
     
     match /{groupPath=**}/members/{memberID} {
-      allow list;
+      allow list: if request.auth.uid == resource.data.userId;
     }
     
     match /groups/{groupId}/members/{userId} {
