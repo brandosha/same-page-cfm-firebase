@@ -4,6 +4,7 @@ vscode:
     - octref.vetur@0.22.2:KOvI2Xa9VX4Lga8ukQxS2A==
 tasks:
   - command: npm install -g firebase-tools
+  - init: gitpod_startup.sh
 github:
   prebuilds:
     master: false
