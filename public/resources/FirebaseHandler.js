@@ -6,8 +6,7 @@ class FirebaseHandler {
         this.firestore = firebase.firestore()
         this.functions = firebase.functions()
 
-        var groups = localStorage.getItem('groups')
-        groups = groups !== null ? JSON.parse(groups) : { }
+        var groups = getLocalObj('groups')
 
         this.dataObj = {
             groups: groups,
@@ -17,6 +16,10 @@ class FirebaseHandler {
         }
 
         this.getLocalUsers()
+        this.getLocalMessages()
+
+        window.addEventListener('offline', this.connectionStatusChanged)
+        window.addEventListener('online', this.connectionStatusChanged)
     }
 
     getLocalUsers() {
@@ -31,10 +34,39 @@ class FirebaseHandler {
         }
 
         users.forEach(userId => {
-            var userData = localStorage.getItem('user_' + userId)
-            userData = userData !== null ? JSON.parse(userData) : { } 
+            var userData = getLocalObj('user_' + userId)
             this.dataObj.users[userId] = userData
         })
+    }
+
+    getLocalMessages() {
+        var groupIds = Object.keys(this.dataObj.groups)
+        groupIds.forEach(groupId => {
+            var messages = getLocalObj(groupId + '_messages')
+            for (const messageId in messages) {
+                messages[messageId].sent = new Date(messages[messageId].sent)
+            }
+            this.dataObj.groups[groupId].messages = messages
+        })
+    }
+
+    connectionStatusChanged() {
+        var offline = !navigator.offline
+        this.dataObj.offline = offline
+
+        this.refreshAndConnectAll()
+    }
+
+    async refreshAndConnectAll() {
+        var self = this
+
+        await this.refreshGroups()
+        var groupIds = Object.keys(this.dataObj.groups)
+        await asyncForEach(groupIds, async groupId => {
+            await self.refreshGroupMembers(groupId)
+            await self.refreshMessages(groupId)
+        })
+        await this.refreshUsers()
     }
 
     async refreshGroups() {
@@ -61,15 +93,14 @@ class FirebaseHandler {
     async refreshGroupMembers(groupId) {
         if (this.dataObj.offline) return
 
-        var groupExists = groupId in this.dataObj.groups
-        if (!groupExists) {
-            throw new Error('No group found with id ' + groupId)
+        if (!this.groupExists(groupId)) {
+            throw new Error('No group with id ' + groupId)
         }
 
         var groupMembers = { }
 
-        var membersCollection = await this.firestore.collection('groups/' + groupId + '/members').get()
-        membersCollection.forEach(snapshot => {
+        var membersQuery = await this.firestore.collection('groups/' + groupId + '/members').get()
+        membersQuery.forEach(snapshot => {
             groupMembers[snapshot.id] = {
                 isManager: snapshot.data().isManager
             }
@@ -93,10 +124,42 @@ class FirebaseHandler {
             localStorage.setItem('user_' + userId, JSON.stringify(userObj))
         })
     }
+
+    groupExists(groupId) {
+        return groupId in this.dataObj.groups
+    }
+
+    async refreshMessages(groupId) {
+        if (this.dataObj.offline) return
+
+        if (!this.groupExists(groupId)) {
+            throw new Error('No group with id ' + groupId)
+        }
+
+        var messages = { }
+
+        var messagesQuery = await this.firestore.collection('groups/' + groupId + '/messages').get()
+        messagesQuery.forEach(snapshot => {
+            var messageData = snapshot.data()
+            messages[snapshot.id] = {
+                from: messageData.from,
+                text: messageData.text,
+                sent: messageData.sent.toDate()
+            }
+        })
+
+        this.dataObj.groups[groupId].messages = messages
+        localStorage.setItem(groupId + '_messages', JSON.stringify(messages))
+    }
 }
 
 async function asyncForEach(array, callback) {
     for (let i = 0; i < array.length; i++) {
         await callback(array[i], i, array)
     }
+}
+
+function getLocalObj(key) {
+    var data = localStorage.getItem(key)
+    return data !== null ? JSON.parse(data) : { }
 }
