@@ -22,13 +22,14 @@ service cloud.firestore {
       allow delete: if resource.data.from == request.auth.uid || isManagerOfGroup(groupId)
     }
     
-    match /{groupPath=**}/members/{memberID} {
-      allow list: if request.auth.uid == resource.data.userId;
-    }
-    
     match /groups/{groupId}/members/{userId} {
+    	allow read: if isMemberOfGroup(groupId)
     	allow create, update: if isManagerOfGroup(groupId)
       allow delete: if userId == request.auth.uid || isManagerOfGroup(groupId)
+    }
+
+    match /{groupPath=**}/members/{memberID} {
+      allow list: if request.auth.uid == resource.data.userId;
     }
     
     match /users/{userId} {
