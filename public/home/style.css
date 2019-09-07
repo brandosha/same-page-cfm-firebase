@@ -1,0 +1,11 @@
+.log {
+    background-color: lightgray;
+}
+
+.error {
+    background-color: lightcoral;
+}
+
+.info {
+    background-color: lightblue;
+}
