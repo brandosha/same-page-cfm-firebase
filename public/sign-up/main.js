@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (user === null) {
-            loading.hide()
+            loader.hide()
             return
         }
         db.collection('users').doc(user.uid).set({
@@ -24,17 +24,14 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 })
 
-var loading = new Vue({
-    el: '#loading',
-    methods: {
-        hide: function() {
-            $('#loading').hide()
-        },
-        show: function() {
-            $('#loading').show()
-        }
+var loader = {
+    hide() {
+        $('#loader').hide()
+    },
+    show() {
+        $('#loader').show()
     }
-})
+}
 
 var signUpForm = new Vue({
     el: '#sign-up-form',
@@ -97,10 +94,10 @@ var signUpForm = new Vue({
 
             if (!formValid) return
 
-            loading.show()
+            loader.show()
             auth.createUserWithEmailAndPassword(this.emailInput.value, this.passwordInput.value)
                 .catch(error => {
-                    loading.hide()
+                    loader.hide()
                     if (error.code == 'auth/invalid-email') {
                         this.emailInput.isValid = false
                         this.emailInput.error = 'Enter a valid email'

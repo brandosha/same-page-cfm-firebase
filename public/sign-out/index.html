@@ -21,8 +21,14 @@
     <link rel="stylesheet" href="/resources/loader.css">
 </head>
   <body>
-    <div id="loading">
-      <full-page-loader delays="54321"></full-page-loader>
+    <div id="loader" class="full-page-container">
+      <div class="loader-container">
+        <div class="d5"></div>
+        <div class="d4"></div>
+        <div class="d3"></div>
+        <div class="d2"></div>
+        <div class="d1"></div>
+      </div>
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -31,10 +37,6 @@
         .then(result => {
           window.location.replace('/')
         })
-    })
-
-    var loading = new Vue({
-        el: '#loading'
     })
     </script>
   </body>

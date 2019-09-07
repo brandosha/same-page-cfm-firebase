@@ -1,4 +1,4 @@
-var loader = Vue.component('loader', {
+/*var loader = Vue.component('loader', {
     template:
     `
     <div class="loader-container">
@@ -40,4 +40,13 @@ var fullPageLoader = Vue.component('full-page-loader', {
             }
         }
     }
-})
+})*/
+
+var loader = {
+    hide() {
+        $('#loader').hide()
+    },
+    show() {
+        $('#loader').show()
+    }
+}

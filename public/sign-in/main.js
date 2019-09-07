@@ -5,21 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (user !== null) {
       window.location.replace('/home')
     } else {
-      loading.hide()
+      loader.hide()
     }
   })
-})
-
-var loading = new Vue({
-  el: '#loading',
-  methods: {
-    hide: function() {
-      $('#loading').hide()
-    },
-    show: function() {
-      $('#loading').show()
-    }
-  }
 })
 
 var signUpForm = new Vue({
@@ -30,10 +18,10 @@ var signUpForm = new Vue({
   },
   methods: {
     handleFormSubmit: function() {
-      loading.show()
+      loader.show()
       auth.signInWithEmailAndPassword(this.email, this.password)
       .catch(error => {
-        loading.hide()
+        loader.hide()
         $('#invalid-credentials').show()
       })
     }
