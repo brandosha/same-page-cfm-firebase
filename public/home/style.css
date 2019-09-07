@@ -8,12 +8,12 @@
     width: 100%;
     height: 25%;
     bottom: 0;
-    padding-top: 70px;
+    padding-top: 0;
 }
 
 #debug-top {
     position: fixed;
-    bottom: calc(25% - 70px);
+    bottom: 25%;
 }
 
 #debug-resize-control {
