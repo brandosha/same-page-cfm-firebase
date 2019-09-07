@@ -26,13 +26,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
   <body>
-    <div id="debug" class="d-">
-      <form @submit.prevent='execute'>
-        <input type="text" v-model="command">
-        <input type="submit" value="Execute">
-      </form>
-      <div class="text-monospace border-bottom px-2" v-for="log in logs" :class="log.type">
-        <pre class="d-inline">{{ log.text }}</pre>
+    <div id="debug">
+      <div v-if="debugging" id="debug-body">
+        <div id="debug-top" class="w-100 bg-light">
+          <div id="debug-resize-control" class="w-100 d-flex justify-content-center align-items-center" style="height: 8px; background-color: gray">
+            <div style="height: 2px; width: 30px; background-color: black"></div>
+          </div>
+          <form @submit.prevent='execute' class="container-fluid mt-2">
+            <div class="row form-group">
+              <input type="text" v-model="command" class="form-control mx-2 col">
+              <input type="submit" value="Execute" class="btn btn-primary mx-2 col-auto">
+            </div>
+          </form>
+        </div>
+        
+        <div class="text-monospace border-bottom px-2" v-for="log in logs" :class="log.type">
+          <pre class="d-inline">{{ log.text }}</pre>
+        </div>
       </div>
     </div>
 

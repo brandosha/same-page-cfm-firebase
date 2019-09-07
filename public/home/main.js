@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
 var debug = new Vue({
     el: '#debug',
     data: {
+        debugging: true,
         command: '',
         logs: myConsole.allLogs
     },
@@ -39,5 +40,29 @@ var debug = new Vue({
 
             this.command = correctCommand
         }
+    }
+})
+
+var resizingDebug = false
+var originalMouseY = 0
+var originalHeight = 0
+
+$('#debug-resize-control').mousedown(event => {
+    resizingDebug = true
+    originalMouseY = event.screenY
+    originalHeight = $('#debug-body').height()
+})
+
+$(document).mouseup(event => {
+    if (resizingDebug) resizingDebug = false
+})
+
+$(document).mousemove(event => {
+    if (resizingDebug) {
+        var difference = originalMouseY - event.screenY
+        var newHeight = originalHeight + difference
+        newHeight = Math.max(8, Math.min(newHeight, $(window).height()))
+        $('#debug-body').height(newHeight)
+        $('#debug-top').css('bottom', newHeight + 'px')
     }
 })
