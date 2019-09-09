@@ -79,14 +79,14 @@ class FirebaseHandler {
 
             var unsubscriber = this.firestore.collection('groups/' + groupId + '/messages')
             .onSnapshot(querySnapshot => {
-
-
                 querySnapshot.docChanges().forEach(change => {
                     var snapshot = change.doc
                     if (change.type === 'removed') {
                         this.dataObj.groups[groupId].messages[snapshot.id] = undefined
-                    } else {
+                    } else if (!(snapshot.id in this.dataObj.groups[groupId].messages)) {
                         var messageData = snapshot.data()
+                        if (messageData.sent === null) return
+
                         this.dataObj.groups[groupId].messages[snapshot.id] = {
                             from: messageData.from,
                             text: messageData.text,
@@ -112,7 +112,13 @@ class FirebaseHandler {
         await asyncForEach(groupIds, async groupId => {
             var groupData = await this.firestore.doc('groups/' + groupId).get()
             groupData = groupData.data()
-            this.dataObj.groups[groupId].name = groupData.name
+            if (groupId in this.dataObj.groups) {
+                this.dataObj.groups[groupId].name = groupData.name
+            } else {
+                this.dataObj.groups[groupId] = {
+                    name: groupData.name
+                }
+            }
         })
 
         var groupsData = copyOf(this.dataObj.groups)
@@ -212,10 +218,18 @@ class FirebaseHandler {
             text: text
         }
 
+        var localObj = {
+            from: this.dataObj.uid,
+            text: text
+        }
+        var tempId = 'sending_' + Math.random().toString(36).substring(2)
+        this.dataObj.groups[groupId].messages[tempId] = localObj
+
         var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
         
-        messageObj.sent = new Date()
-        console.log(messageObj)
+        this.dataObj.groups[groupId].messages[tempId] = undefined
+        localObj.sent = new Date()
+        this.dataObj.groups[groupId].messages[newDoc.id] = localObj
     }
 }
 
