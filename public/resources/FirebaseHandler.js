@@ -1,4 +1,4 @@
-var offlineOverride = true
+var offlineOverride = false
 
 class FirebaseHandler {
     constructor(firebase) {
@@ -14,12 +14,14 @@ class FirebaseHandler {
             uid: this.auth.currentUser.uid,
             offline: !navigator.onLine || offlineOverride
         }
+        this.listenerUnsubscribers = []
+        this.sentMessageIds = []
 
         this.getLocalUsers()
         this.getLocalMessages()
 
-        window.addEventListener('offline', this.connectionStatusChanged)
-        window.addEventListener('online', this.connectionStatusChanged)
+        window.addEventListener('offline', this.connectionStatusChanged.bind(this))
+        window.addEventListener('online', this.connectionStatusChanged.bind(this))
     }
 
     getLocalUsers() {
@@ -51,10 +53,19 @@ class FirebaseHandler {
     }
 
     connectionStatusChanged() {
-        var offline = !navigator.offline
+        var offline = !navigator.onLine
         this.dataObj.offline = offline
 
-        this.refreshAndConnectAll()
+        console.log('Connection is now ' + (offline ? 'offline' : 'online'))
+
+        if (!offline) {
+            this.refreshAndConnectAll()
+        } else {
+            this.listenerUnsubscribers.forEach(unsubscribe => {
+                unsubscribe()
+            })
+            this.listenerUnsubscribers = []
+        }
     }
 
     async refreshAndConnectAll() {
@@ -65,14 +76,34 @@ class FirebaseHandler {
         await asyncForEach(groupIds, async groupId => {
             await self.refreshGroupMembers(groupId)
             await self.refreshMessages(groupId)
+
+            var unsubscriber = this.firestore.collection('groups/' + groupId + '/messages')
+            .onSnapshot(querySnapshot => {
+
+
+                querySnapshot.docChanges().forEach(change => {
+                    var snapshot = change.doc
+                    if (change.type === 'removed') {
+                        this.dataObj.groups[groupId].messages[snapshot.id] = undefined
+                    } else {
+                        var messageData = snapshot.data()
+                        this.dataObj.groups[groupId].messages[snapshot.id] = {
+                            from: messageData.from,
+                            text: messageData.text,
+                            sent: messageData.sent.toDate()
+                        }
+                    }
+                })
+
+                localStorage.setItem(groupId + '_messages', JSON.stringify(this.dataObj.groups[groupId].messages))
+            })
+            this.listenerUnsubscribers.push(unsubscriber)
         })
         await this.refreshUsers()
     }
 
     async refreshGroups() {
         if (this.dataObj.offline) return
-
-        var groupsData = { }
 
         await this.auth.currentUser.getIdToken(true)
         var tokenInfo = await this.auth.currentUser.getIdTokenResult()
@@ -81,12 +112,13 @@ class FirebaseHandler {
         await asyncForEach(groupIds, async groupId => {
             var groupData = await this.firestore.doc('groups/' + groupId).get()
             groupData = groupData.data()
-            groupsData[groupId] = {
-                name: groupData.name
-            }
+            this.dataObj.groups[groupId].name = groupData.name
         })
 
-        this.dataObj.groups = groupsData
+        var groupsData = copyOf(this.dataObj.groups)
+        for (const groupId in groupsData) {
+            groupsData[groupId].messages = undefined
+        }
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
 
@@ -107,7 +139,12 @@ class FirebaseHandler {
         })
 
         this.dataObj.groups[groupId].members = groupMembers
-        localStorage.setItem('groups', JSON.stringify(this.dataObj.groups))
+
+        var groupsData = copyOf(this.dataObj.groups)
+        for (const groupId in groupsData) {
+            groupsData[groupId].messages = undefined
+        }
+        localStorage.setItem('groups', JSON.stringify(groupsData))
     }
 
     async refreshUsers() {
@@ -140,6 +177,14 @@ class FirebaseHandler {
 
         var messagesQuery = await this.firestore.collection('groups/' + groupId + '/messages').get()
         messagesQuery.forEach(snapshot => {
+            if (
+                this.dataObj.groups[groupId].messages !== undefined && 
+                snapshot.id in this.dataObj.groups[groupId].messages
+            ) {
+                messages[snapshot.id] = this.dataObj.groups[groupId].messages[snapshot.id]
+                return
+            }
+
             var messageData = snapshot.data()
             messages[snapshot.id] = {
                 from: messageData.from,
@@ -150,6 +195,27 @@ class FirebaseHandler {
 
         this.dataObj.groups[groupId].messages = messages
         localStorage.setItem(groupId + '_messages', JSON.stringify(messages))
+    }
+
+    async sendMessage(text, groupId) {
+        if (this.dataObj.offline) return
+
+        if (text.length < 0 || typeof text !== 'string') return
+
+        if (!this.groupExists(groupId)) {
+            throw new Error('No group with id ' + groupId)
+        }
+
+        var messageObj = {
+            from: this.dataObj.uid,
+            sent: firebase.firestore.FieldValue.serverTimestamp(),
+            text: text
+        }
+
+        var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
+        
+        messageObj.sent = new Date()
+        console.log(messageObj)
     }
 }
 
@@ -162,4 +228,8 @@ async function asyncForEach(array, callback) {
 function getLocalObj(key) {
     var data = localStorage.getItem(key)
     return data !== null ? JSON.parse(data) : { }
+}
+
+function copyOf(obj) {
+    return JSON.parse(JSON.stringify(obj))
 }
