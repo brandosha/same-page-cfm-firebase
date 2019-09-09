@@ -26,6 +26,50 @@
     <link rel="stylesheet" href="style.css">
 </head>
   <body>
+    <div id="vue-main" class="container-fluid p-0">
+      <div class="row">
+        <div class="col-sm" :class="{ 'd-none d-sm-block': isValidGroup }">
+          <div v-for="(value, key) in firebaseData.groups">
+            <a class="btn btn-dark w-100 border-bottom group-btn px-3 py-1" :href="'#'+key">
+              <span class="h5 text-capitalize">{{ value.name }}</span>
+              <br>
+              <span class="text-truncate">Filler data</span>
+            </a>
+          </div>
+        </div>
+        <div class="col-sm-8" v-if="isValidGroup">
+          <div id="messages">
+            <div v-for="(value, key) in firebaseData.groups[groupId].messages" v-if="value !== undefined">
+              <span class="text-capitalize">{{ firebaseData.users[value.from].name }}</span>: {{ value.text }}
+            </div>
+          </div>
+          <div id="message-input">
+            <form @submit.prevent="sendMessage" class="container-fluid">
+              <div class="row form-group">
+                <input type="text" v-model="newMessage" class="form-control mx-2 col">
+                <input type="submit" value="Send" class="btn btn-primary mx-2 col-auto">
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="col-sm-8 d-none d-sm-block" v-else>
+          Select a group
+        </div>
+      </div>
+    </div>
+
+    <!--
+    <div id="group-ui">
+      <div v-if="isValidGroup" id="group-ui-body">
+        <div id="messages">
+          <div v-for="(value, key) in firebaseData.groups[groupId].messages">
+            {{ firebaseData.users[value.from].name }}: {{ value.text }}
+          </div>
+        </div>
+      </div>
+    </div>
+    -->
+
     <div id="debug">
       <div v-if="debugging" id="debug-body">
         <div id="debug-top" class="w-100 bg-light">
@@ -34,7 +78,7 @@
           </div>
           <form @submit.prevent='execute' class="container-fluid mt-2">
             <div class="row form-group">
-              <input type="text" v-model="command" class="form-control mx-2 col">
+              <input type="text" v-model="command" class="form-control text-monospace mx-2 col">
               <input type="submit" value="Execute" class="btn btn-primary mx-2 col-auto">
             </div>
           </form>
