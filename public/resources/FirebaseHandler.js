@@ -20,6 +20,10 @@ class FirebaseHandler {
         this.getLocalUsers()
         this.getLocalMessages()
 
+        for (const groupId in this.dataObj.groups) {
+            this.createMessagesArray(groupId)
+        }
+
         window.addEventListener('offline', this.connectionStatusChanged.bind(this))
         window.addEventListener('online', this.connectionStatusChanged.bind(this))
     }
@@ -48,7 +52,7 @@ class FirebaseHandler {
             for (const messageId in messages) {
                 messages[messageId].sent = new Date(messages[messageId].sent)
             }
-            this.dataObj.groups[groupId].messages = messages
+            this.dataObj.groups[groupId].messagesObj = messages
         })
     }
 
@@ -68,6 +72,27 @@ class FirebaseHandler {
         }
     }
 
+    createMessagesArray(groupId) {
+        var messagesObj = this.dataObj.groups[groupId].messagesObj
+
+        var messagesArr = []
+        for (const messageId in messagesObj) {
+            var messageObj = messagesObj[messageId]
+
+            messagesArr.push({
+                from: messageObj.from,
+                sent: messageObj.sent,
+                text: messageObj.text
+            })
+        }
+
+        messagesArr.sort((a, b) => {
+            return a.sent.getTime() - b.sent.getTime()
+        })
+
+        this.dataObj.groups[groupId].messagesArr = messagesArr
+    }
+
     async refreshAndConnectAll() {
         var self = this
 
@@ -82,20 +107,40 @@ class FirebaseHandler {
                 querySnapshot.docChanges().forEach(change => {
                     var snapshot = change.doc
                     if (change.type === 'removed') {
-                        this.dataObj.groups[groupId].messages[snapshot.id] = undefined
-                    } else if (!(snapshot.id in this.dataObj.groups[groupId].messages)) {
+                        var deletedMessage = this.dataObj.groups[groupId].messagesObj[snapshot.id]
+
+                        var messageRemoved = false
+                        this.dataObj.groups[groupId].messagesArr = 
+                        this.dataObj.groups[groupId].messagesArr.filter(value => {
+                            if (messageRemoved) return true
+
+                            if (
+                                value.from == deletedMessage.from &&
+                                value.text == deletedMessage.text &&
+                                value.sent.getTime() == deletedMessage.sent.getTime()
+                            ) {
+                                messageRemoved = true
+                                return false
+                            }
+                        })
+
+                        this.dataObj.groups[groupId].messagesObj[snapshot.id] = undefined
+                    } else if (!(snapshot.id in this.dataObj.groups[groupId].messagesObj)) {
                         var messageData = snapshot.data()
                         if (messageData.sent === null) return
 
-                        this.dataObj.groups[groupId].messages[snapshot.id] = {
+                        var messageObj = {
                             from: messageData.from,
                             text: messageData.text,
                             sent: messageData.sent.toDate()
                         }
+
+                        this.dataObj.groups[groupId].messagesObj[snapshot.id] = messageObj
+                        this.dataObj.groups[groupId].messagesArr.push(messageObj)
                     }
                 })
 
-                localStorage.setItem(groupId + '_messages', JSON.stringify(this.dataObj.groups[groupId].messages))
+                localStorage.setItem(groupId + '_messages', JSON.stringify(this.dataObj.groups[groupId].messagesObj))
             })
             this.listenerUnsubscribers.push(unsubscriber)
         })
@@ -123,7 +168,7 @@ class FirebaseHandler {
 
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
-            groupsData[groupId].messages = undefined
+            groupsData[groupId].messagesObj = undefined
         }
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
@@ -148,7 +193,7 @@ class FirebaseHandler {
 
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
-            groupsData[groupId].messages = undefined
+            groupsData[groupId].messagesObj = undefined
         }
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
@@ -199,15 +244,13 @@ class FirebaseHandler {
             }
         })
 
-        this.dataObj.groups[groupId].messages = messages
+        this.dataObj.groups[groupId].messagesObj = messages
         localStorage.setItem(groupId + '_messages', JSON.stringify(messages))
     }
 
     async sendMessage(text, groupId) {
         if (this.dataObj.offline) return
-
-        if (text.length < 0 || typeof text !== 'string') return
-
+        if (text.length <= 0 || typeof text !== 'string') return
         if (!this.groupExists(groupId)) {
             throw new Error('No group with id ' + groupId)
         }
@@ -218,18 +261,18 @@ class FirebaseHandler {
             text: text
         }
 
-        var localObj = {
+        var arrIndex = this.dataObj.groups[groupId].messagesArr.length
+        this.dataObj.groups[groupId].messagesArr.push({
             from: this.dataObj.uid,
             text: text
-        }
-        var tempId = 'sending_' + Math.random().toString(36).substring(2)
-        this.dataObj.groups[groupId].messages[tempId] = localObj
+        })
 
         var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
         
-        this.dataObj.groups[groupId].messages[tempId] = undefined
-        localObj.sent = new Date()
-        this.dataObj.groups[groupId].messages[newDoc.id] = localObj
+        var now = new Date()
+        messageObj.sent = now
+        this.dataObj.groups[groupId].messagesObj[newDoc.id] = messageObj
+        this.dataObj.groups[groupId].messagesArr[arrIndex].sent = now
     }
 }
 

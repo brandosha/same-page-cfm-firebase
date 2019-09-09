@@ -38,15 +38,15 @@
           </div>
         </div>
         <div class="col-sm-8" v-if="isValidGroup">
-          <div id="messages">
-            <div v-for="(value, key) in firebaseData.groups[groupId].messages" v-if="value !== undefined">
-              <span class="text-capitalize">{{ firebaseData.users[value.from].name }}</span>: {{ value.text }}
+          <div id="messages" class="container">
+            <div v-for="message in firebaseData.groups[groupId].messagesArr" v-if="message !== undefined">
+              <span class="text-capitalize">{{ firebaseData.users[message.from].name }}</span>: {{ message.text }}
             </div>
           </div>
           <div id="message-input">
             <form @submit.prevent="sendMessage" class="container-fluid">
               <div class="row form-group">
-                <input type="text" v-model="newMessage" class="form-control mx-2 col">
+                <input type="text" v-model="newMessage" class="form-control mx-3 col">
                 <input type="submit" value="Send" class="btn btn-primary mx-2 col-auto">
               </div>
             </form>

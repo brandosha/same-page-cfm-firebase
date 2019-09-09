@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
 var debug = new Vue({
     el: '#debug',
     data: {
-        debugging: true,
+        debugging: false,
         command: '',
         logs: myConsole.allLogs
     },
