@@ -10,6 +10,12 @@ try {
     admin.initializeApp()
 }
 
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://same-page-cfm.firebaseio.com"
+});
+
 const firestore = admin.firestore()
 const auth = admin.auth()
 
@@ -26,7 +32,34 @@ async function isGroupManager(groupId, auth) {
     return false
 }
 
-exports.searchEmailAddress = functions.https.onCall(async (data, context) => {
+exports.updateCustomClaims = functions.firestore
+.document('groups/{groupId}/members/{memberId}')
+.onWrite( async (change, context) => {
+    try {
+        var user = await auth.getUser(context.params.memberId)
+    } catch (error) {
+        console.error(error)
+        return
+    }
+    var claims = user.customClaims
+    var userGroups = claims.groups !== undefined ? claims.groups : { }
+    
+    if (change.after.exists) {
+        userGroups[context.params.groupId] = {
+            isManager: change.after.data.isManager
+        }
+    } else {
+        userGroups[context.params.groupId] = undefined
+    }
+
+    try {
+        auth.setCustomUserClaims(user.uid, { groups: userGroups })
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+exports.searchEmailAddress = functions.https.onCall( async (data, context) => {
     const emailAddr = data.emailAddress
     const groupId = data.groupId
 
@@ -60,78 +93,5 @@ exports.searchEmailAddress = functions.https.onCall(async (data, context) => {
             }
         }
         throw new functions.https.HttpsError('unknown', error.message)
-    }
-})
-
-exports.getGroupIds = functions.https.onCall(async (data, context) => {
-    var groups = []
-    var membersGroup = firestore.collectionGroup('members')
-
-    try {
-        var querySnapshot = await membersGroup.where('userId', '==', context.auth.uid).get()
-        querySnapshot.forEach(docSnapshot => {
-            groups.push(docSnapshot.ref.parent.parent.id)
-        })
-    } catch(error) {
-        throw new functions.https.HttpsError('unknown', error.message)
-    }
-
-    return {
-        input: data,
-        groupIds: groups
-    }
-})
-
-exports.getMessageIds = functions.https.onCall(async (data, context) => {
-    const groupId = data.groupId
-
-    if (context.auth === undefined) {
-        throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
-    }
-    if (groupId === undefined || groupId === null) {
-        throw new functions.https.HttpsError('invalid-argument', 'No group id was supplied')
-    }
-
-    const groupMember = await isGroupMember(groupId, context.auth)
-    if (!groupMember) {
-        throw new functions.https.HttpsError('permission-denied', 'You are not a member of the group')
-    }
-
-    var messages = []
-    var messageQuery = await firestore.collection('groups/' + groupId + '/messages').get()
-    messageQuery.forEach(result => {
-        messages.push(result.id)
-    })
-
-    return {
-        input: data,
-        messageIds: messages
-    }
-})
-
-exports.getGroupMemberIds = functions.https.onCall(async (data, context) => {
-    const groupId = data.groupId
-
-    if (context.auth === undefined) {
-        throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
-    }
-    if (groupId === undefined || groupId === null) {
-        throw new functions.https.HttpsError('invalid-argument', 'No group id was supplied')
-    }
-
-    const groupMember = await isGroupMember(groupId, context.auth)
-    if (!groupMember) {
-        throw new functions.https.HttpsError('permission-denied', 'You are not a member of the group')
-    }
-
-    var members = []
-    var messageQuery = await firestore.collection('groups/' + groupId + '/members').get()
-    messageQuery.forEach(result => {
-        members.push(result.id)
-    })
-
-    return {
-        input: data,
-        memberIds: members
     }
 })
