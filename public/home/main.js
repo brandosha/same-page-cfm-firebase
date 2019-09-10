@@ -38,6 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     var messageText = this.newMessage
                     this.newMessage = ''
                     firebaseHandler.sendMessage(messageText, this.groupId)
+                    .then(_ => {
+                        $('#messages').stop().animate({
+                            scrollTop: $('#messages')[0].scrollHeight
+                        });
+                    })
                 },
                 selectGroup: function(groupId) {
                     window.location.hash = groupId
@@ -47,12 +52,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 isValidGroup: function() {
                     return firebaseHandler.groupExists(this.groupId)
                 }
+            },
+            created: function() {
+                this.$nextTick(_ => {
+                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                })
             }
         })
 
         $(window).on('hashchange', event => {
             var newHash = window.location.hash.slice(1)
             mainUI.groupId = newHash
+            mainUI.$nextTick(_ => {
+                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            })
         })
 
         await firebaseHandler.refreshAndConnectAll()
