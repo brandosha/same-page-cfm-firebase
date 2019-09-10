@@ -229,10 +229,10 @@ class FirebaseHandler {
         var messagesQuery = await this.firestore.collection('groups/' + groupId + '/messages').get()
         messagesQuery.forEach(snapshot => {
             if (
-                this.dataObj.groups[groupId].messages !== undefined && 
-                snapshot.id in this.dataObj.groups[groupId].messages
+                this.dataObj.groups[groupId].messagesObj !== undefined && 
+                snapshot.id in this.dataObj.groups[groupId].messagesObj
             ) {
-                messages[snapshot.id] = this.dataObj.groups[groupId].messages[snapshot.id]
+                messages[snapshot.id] = this.dataObj.groups[groupId].messagesObj[snapshot.id]
                 return
             }
 
