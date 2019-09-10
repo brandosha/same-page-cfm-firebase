@@ -4,17 +4,16 @@ const admin = require('firebase-admin');
 try {
     var serviceAccount = require('../.firebase/admin-sdk-credentials.json');
     // initialize app with service credentials here
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        // Update to your database url if necessary
+        databaseURL: "https://same-page-cfm.firebaseio.com"
+    });
 } catch (error) {
     // no credentials found
     console.error(error)
     admin.initializeApp()
 }
-
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://same-page-cfm.firebaseio.com"
-});
 
 const firestore = admin.firestore()
 const auth = admin.auth()
