@@ -1,27 +1,12 @@
-/*
-#group-selection-ui-body {
-    background-color: white;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-}
-*/
-
 #vue-main {
     overflow: hidden;
     height: 100vh;
-    /*height: 100vh;
-    width: 100vh;*/
 }
 
 .group-btn {
     border: none;
     text-align: left;
     border-radius: 0;
-    /*font-size: 1.25em;*/
-    /* height: 3em; */
 }
 
 #group-toolbar {
@@ -47,8 +32,6 @@
 #message-input {
     padding: 5px 0;
     margin-bottom: 0;
-    /*display: absolute;
-    bottom: 0;*/
 }
 
 #group-ui-body {
