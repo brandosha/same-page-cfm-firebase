@@ -1,7 +1,4 @@
 var firebaseHandler;
-/*var groupUI;
-var groupSelectionUI;*/
-
 var mainUI;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,17 +11,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         firebaseHandler = new FirebaseHandler(firebase)
 
-        /*groupSelectionUI = new Vue({
-            el: '#group-selection-ui',
-            data: {
-                firebaseData: firebaseHandler.dataObj
-            },
-            methods: {
-                selectGroup: function(groupId) {
-                    window.location.hash = groupId
-                }
-            }
-        })*/
+        $(window).on('hashchange', event => {
+            var newHash = window.location.hash.slice(1)
+            mainUI.groupId = newHash
+            mainUI.$nextTick(_ => {
+                $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            })
+        })
+
+        await firebaseHandler.refreshAndConnectAll()
 
         mainUI = new Vue({
             el: '#vue-main',
@@ -56,20 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
             created: function() {
                 this.$nextTick(_ => {
                     $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    loader.hide()
                 })
             }
         })
-
-        $(window).on('hashchange', event => {
-            var newHash = window.location.hash.slice(1)
-            mainUI.groupId = newHash
-            mainUI.$nextTick(_ => {
-                $('#messages').scrollTop($('#messages')[0].scrollHeight);
-            })
-        })
-
-        await firebaseHandler.refreshAndConnectAll()
-        loader.hide()
     })
 })
 
