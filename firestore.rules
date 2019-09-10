@@ -20,7 +20,7 @@ service cloud.firestore {
     match /groups/{groupId}/messages/{messageId} {
       allow read: if isMemberOfGroup(groupId)
       allow delete: if resource.data.from == request.auth.uid || isManagerOfGroup(groupId)
-      allow create: if isMemberOfGroup(groupId) && resource.data.from == request.auth.uid
+      allow create: if isMemberOfGroup(groupId) && request.resource.data.from == request.auth.uid
     }
     
     match /groups/{groupId}/members/{userId} {
