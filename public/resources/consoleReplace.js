@@ -25,6 +25,8 @@ function superLog(type) {
     }
 }
 
+/*
 console.log = superLog('log')
 console.error = superLog('error')
 console.info = superLog('info')
+*/
