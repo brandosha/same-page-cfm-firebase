@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var newHash = window.location.hash.slice(1)
             mainUI.groupId = newHash
             mainUI.$nextTick(_ => {
+                if (!this.isValidGroup) return
                 $('#messages').scrollTop($('#messages')[0].scrollHeight);
             })
         })
