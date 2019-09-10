@@ -17,7 +17,7 @@
     <script src="/resources/consoleReplace.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="/resources/loader.js"></script>
     <script src="/resources/FirebaseHandler.js"></script>
 
@@ -28,17 +28,31 @@
   <body>
     <div id="vue-main" class="container-fluid p-0">
       <div class="row">
-        <div class="col-sm" :class="{ 'd-none d-sm-block': isValidGroup }">
-          <div v-for="(value, key) in firebaseData.groups">
-            <a class="btn btn-dark w-100 border-bottom group-btn px-3 py-1" :href="'#'+key">
-              <span class="h5 text-capitalize">{{ value.name }}</span>
-              <br>
-              <span class="text-truncate">Filler data</span>
+        <div class="col-sm-4" :class="{ 'd-none d-sm-block': isValidGroup }">
+          <div v-for="(group, id) in firebaseData.groups">
+            <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === id ? 'btn-light' : 'btn-dark'" :href="'#'+id">
+              <span class="h5 text-capitalize">{{ group.name }}</span>
+              <div class="text-truncate">{{ lastMessage(id) }}</div>
             </a>
           </div>
         </div>
         <div class="col-sm-8" v-if="isValidGroup">
           <div id="messages" class="container">
+            <nav id="group-toolbar" class="d-flex p-1 justify-content-between">
+              <div>
+                <a class="nav-link text-dark h5 m-0 d-xs-block d-sm-none text-capitalize" href="#">
+                  &#9664; {{ firebaseData.groups[groupId].name }}
+                </a>
+              </div>
+              <div class="dropdown" data-toggle="dropdown">
+                <a class="nav-link text-dark h4 m-0" href="#" @click.prevent>&#8943;</a>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="#">test1</a>
+                  <a class="dropdown-item" href="#">test2</a>
+                  <a class="dropdown-item" href="#">test3</a>
+                </div>
+              </div>
+            </nav>
             <div v-for="message in firebaseData.groups[groupId].messagesArr" v-if="message !== undefined">
               <span class="text-capitalize">{{ firebaseData.users[message.from].name }}</span>: {{ message.text }}
             </div>

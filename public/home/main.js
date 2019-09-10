@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.newMessage = ''
                     firebaseHandler.sendMessage(messageText, this.groupId)
                     .then(_ => {
+                        if (!this.isValidGroup) return
                         $('#messages').stop().animate({
                             scrollTop: $('#messages')[0].scrollHeight
                         });
@@ -41,6 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 selectGroup: function(groupId) {
                     window.location.hash = groupId
+                },
+                lastMessage: function(groupId) {
+                    var messages = this.firebaseData.groups[groupId].messagesArr
+                    var message =  messages[messages.length - 1]
+                    return this.firebaseData.users[message.from].name + ': ' + message.text
                 }
             },
             computed: {
@@ -50,7 +56,9 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             created: function() {
                 this.$nextTick(_ => {
-                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    if (this.isValidGroup) {
+                        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    }
                     loader.hide()
                 })
             }
