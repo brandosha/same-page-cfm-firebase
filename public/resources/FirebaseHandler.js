@@ -101,6 +101,7 @@ class FirebaseHandler {
         await asyncForEach(groupIds, async groupId => {
             await self.refreshGroupMembers(groupId)
             await self.refreshMessages(groupId)
+            this.createMessagesArray(groupId)
 
             var unsubscriber = this.firestore.collection('groups/' + groupId + '/messages')
             .onSnapshot(querySnapshot => {
