@@ -78,7 +78,6 @@ exports.listMessageIDs = functions.https.onCall( async (data, context) => {
     documentRefs.forEach(doc => {
         documentIds.push(doc.id)
     })
-    console.log(documentIds)
     
     return {
         input: data,
