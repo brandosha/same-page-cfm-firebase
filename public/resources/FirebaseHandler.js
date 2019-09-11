@@ -124,6 +124,7 @@ class FirebaseHandler {
                                 messageRemoved = true
                                 return false
                             }
+                            return true
                         })
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = undefined
