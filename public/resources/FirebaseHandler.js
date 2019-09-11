@@ -29,7 +29,7 @@ class FirebaseHandler {
         window.addEventListener('online', this.connectionStatusChanged.bind(this))
     }
 
-    getLocalUsers() {
+    getAssociatedUserIds() {
         var users = []
         for (const groupId in this.dataObj.groups) {
             var group = this.dataObj.groups[groupId]
@@ -39,6 +39,12 @@ class FirebaseHandler {
                 }
             }
         }
+
+        return users
+    }
+
+    getLocalUsers() {
+        var users = this.getAssociatedUserIds()
 
         users.forEach(userId => {
             var userData = getLocalObj('user_' + userId)
@@ -202,9 +208,9 @@ class FirebaseHandler {
     }
 
     async refreshUsers() {
-        var userIds = Object.keys(this.dataObj.users)
+        var userIds = this.getAssociatedUserIds()
         var self = this
-        asyncForEach(userIds, async userId => {
+        await asyncForEach(userIds, async userId => {
             var userData = await this.firestore.doc('users/' + userId).get()
             userData = userData.data()
 
@@ -232,7 +238,7 @@ class FirebaseHandler {
         var messageIds = await listMessageIDs({groupId: groupId})
         messageIds = messageIds.data.documentIds
 
-        asyncForEach(messageIds, async messageId => {
+        await asyncForEach(messageIds, async messageId => {
             if (
                 this.dataObj.groups[groupId].messagesObj !== undefined && 
                 messageId in this.dataObj.groups[groupId].messagesObj
