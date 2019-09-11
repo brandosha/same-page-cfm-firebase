@@ -232,7 +232,7 @@ class FirebaseHandler {
         var messageIds = await listMessageIDs({groupId: groupId})
         messageIds = messageIds.data.documentIds
 
-        messageIds.forEach(messageId => {
+        asyncForEach(messageIds, async messageId => {
             if (
                 this.dataObj.groups[groupId].messagesObj !== undefined && 
                 messageId in this.dataObj.groups[groupId].messagesObj
@@ -241,7 +241,7 @@ class FirebaseHandler {
                 return
             }
 
-            var snapshot = this.firestore.doc('groups/' + groupId + '/messages/' + messageId).get()
+            var snapshot = await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).get()
             var messageData = snapshot.data()
             messages[messageId] = {
                 from: messageData.from,
