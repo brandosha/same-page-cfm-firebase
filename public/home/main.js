@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var newHash = window.location.hash.slice(1)
             mainUI.groupId = newHash
             mainUI.$nextTick(_ => {
-                if (!this.isValidGroup) return
+                if (!mainUI.isValidGroup) return
                 $('#messages').scrollTop($('#messages')[0].scrollHeight);
             })
         })
@@ -46,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 lastMessage: function(groupId) {
                     var messages = this.firebaseData.groups[groupId].messagesArr
+                    if (messages.length == 0) return 'No messages'
+
                     var message =  messages[messages.length - 1]
                     return this.firebaseData.users[message.from].name + ': ' + message.text
                 }
