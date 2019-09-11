@@ -5,6 +5,7 @@ class FirebaseHandler {
         this.auth = firebase.auth()
         this.firestore = firebase.firestore()
         this.functions = firebase.functions()
+        this.functions.useFunctionsEmulator('http://localhost:5001')
 
         var groups = getLocalObj('groups')
 
@@ -226,18 +227,22 @@ class FirebaseHandler {
 
         var messages = { }
 
-        var messagesQuery = await this.firestore.collection('groups/' + groupId + '/messages').get()
-        messagesQuery.forEach(snapshot => {
+        var listMessageIDs = this.functions.httpsCallable('listMessageIDs')
+        var messageIds = await listMessageIDs({groupId: groupId})
+        messageIds = messageIds.data.documentIds
+
+        messageIds.forEach(messageId => {
             if (
                 this.dataObj.groups[groupId].messagesObj !== undefined && 
-                snapshot.id in this.dataObj.groups[groupId].messagesObj
+                messageId in this.dataObj.groups[groupId].messagesObj
             ) {
-                messages[snapshot.id] = this.dataObj.groups[groupId].messagesObj[snapshot.id]
+                messages[messageId] = this.dataObj.groups[groupId].messagesObj[messageId]
                 return
             }
 
+            var snapshot = this.firestore.doc('groups/' + groupId + '/' + messageId).get()
             var messageData = snapshot.data()
-            messages[snapshot.id] = {
+            messages[messageId] = {
                 from: messageData.from,
                 text: messageData.text,
                 sent: messageData.sent.toDate()

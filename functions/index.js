@@ -58,6 +58,34 @@ exports.updateCustomClaims = functions.firestore
     }
 })
 
+exports.listMessageIDs = functions.https.onCall( async (data, context) => {
+    const groupId = data.groupId
+
+    if (context.auth === undefined) {
+        throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
+    }
+    if (groupId === undefined || groupId === null) {
+        throw new functions.https.HttpsError('invalid-argument', 'No group id was supplied')
+    }
+    
+    const groupMember = await isGroupMember(groupId, context.auth)
+    if (!groupMember) { 
+        throw new functions.https.HttpsError('permission-denied', 'You are not a member of this group')
+    }
+
+    var documentIds = []
+    var documentRefs = await firestore.collection('groups/' + groupId + '/messages').listDocuments()
+    documentRefs.forEach(doc => {
+        documentIds.push(doc.id)
+    })
+    console.log(documentIds)
+    
+    return {
+        input: data,
+        documentIds: documentIds
+    }
+})
+
 exports.searchEmailAddress = functions.https.onCall( async (data, context) => {
     const emailAddr = data.emailAddress
     const groupId = data.groupId
