@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     auth.onAuthStateChanged(async user => {
         if (!user) {
-            window.location.replace('/sign-up')
+            window.location.replace('/sign-in')
         }
 
         firebaseHandler = new FirebaseHandler(firebase)

@@ -42,7 +42,7 @@
           class="form-control"
           id="password"
           name="password"
-          autocomplete="new-password"
+          autocomplete="password"
         >
       </div>
 
@@ -50,11 +50,15 @@
         No user matches that sign in
       </div>
       
-      <div class="row">
-        <div class="mx-auto w-50">
+      <div class="d-flex justify-content-center">
+        <div class="w-50">
             <input type="submit" value="Sign In" class="btn btn-success w-100">
         </div>
       </div>
+      
+      <small class="form-text text-muted">
+        No account? <a href="/sign-up">Sign up</a>
+      </small>
     </form>
 
     <div id="loader" class="full-page-container">
