@@ -19,7 +19,7 @@
 
 @media (min-width: 576px) {
     #group-toolbar {
-        width: calc(66.66% + 20px);
+        width: calc(66.66% + 5px);
     }
 }
 
