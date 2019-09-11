@@ -12,6 +12,12 @@ service cloud.firestore {
     	return request.auth.token.groups[groupId].isManager == true
     }
     
+    function isValidMessage() {
+      return 
+        request.resource.data.from == request.auth.uid &&
+        request.resource.data.text.trim().size() > 0
+    }
+    
   	match /groups/{groupId} {
       allow read: if isMemberOfGroup(groupId)
       allow write: if isManagerOfGroup(groupId)
@@ -20,7 +26,7 @@ service cloud.firestore {
     match /groups/{groupId}/messages/{messageId} {
       allow read: if isMemberOfGroup(groupId)
       allow delete: if resource.data.from == request.auth.uid || isManagerOfGroup(groupId)
-      allow create: if isMemberOfGroup(groupId) && request.resource.data.from == request.auth.uid
+      allow create: if isMemberOfGroup(groupId) && isValidMessage()
     }
     
     match /groups/{groupId}/members/{userId} {
