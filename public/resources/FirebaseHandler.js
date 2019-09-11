@@ -249,10 +249,8 @@ class FirebaseHandler {
     }
 
     async sendMessage(text, groupId) {
-        var text = text.trim()
-
         if (this.dataObj.offline) return
-        if (text.length <= 0 || typeof text !== 'string') return
+        if (typeof text !== 'string' || text.length <= 0) return
         if (!this.groupExists(groupId)) {
             throw new Error('No group with id ' + groupId)
         }

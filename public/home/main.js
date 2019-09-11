@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             methods: {
                 sendMessage: function() {
-                    var messageText = this.newMessage
+                    var messageText = this.newMessage.trim()
                     this.newMessage = ''
                     firebaseHandler.sendMessage(messageText, this.groupId)
                     .then(_ => {
