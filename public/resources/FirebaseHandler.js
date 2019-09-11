@@ -241,7 +241,7 @@ class FirebaseHandler {
                 return
             }
 
-            var snapshot = this.firestore.doc('groups/' + groupId + '/' + messageId).get()
+            var snapshot = this.firestore.doc('groups/' + groupId + '/messages/' + messageId).get()
             var messageData = snapshot.data()
             messages[messageId] = {
                 from: messageData.from,
