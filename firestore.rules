@@ -12,15 +12,25 @@ service cloud.firestore {
     	return request.auth.token.groups[groupId].isManager == true
     }
     
+    function isEmptyString(str) {
+      return 
+        !(str is string) ||
+        str.trim().size() == 0
+    }
+    
     function isValidMessage() {
       return 
         request.resource.data.from == request.auth.uid &&
-        request.resource.data.text.trim().size() > 0
+        !isEmptyString(request.resource.data.text) 
+    }
+    function isValidGroup() {
+      return !isEmptyString(request.resource.data.name)
     }
     
   	match /groups/{groupId} {
       allow read: if isMemberOfGroup(groupId)
-      allow write: if isManagerOfGroup(groupId)
+      allow update: if isManagerOfGroup(groupId)
+      allow create: if request.auth != null && isValidGroup()
     }
     
     match /groups/{groupId}/messages/{messageId} {
