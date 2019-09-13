@@ -119,7 +119,15 @@ function handleUI() {
                     name: this.groupName,
                     members: members
                 })
-                .then(_ => {
+                .then(result => {
+                    var newGroup = result.data
+                    var currentGroups = JSON.parse(localStorage.getItem('groups'))
+                    currentGroups[newGroup.id] = { 
+                        members: newGroup.members,
+                        name: newGroup.name
+                    }
+                    localStorage.setItem('groups', JSON.stringify(currentGroups))
+
                     window.location.href = '/home'
                 })
             },

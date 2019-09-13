@@ -69,10 +69,15 @@ exports.createGroup = functions.https.onCall( async (data, context) => {
     })
 
     var users = await Promise.all(emailPromises)
+    var membersObj = { }
     var memberCreationPromises = users.map(user => {
         if (user.uid === null) {
             // TODO send invite email
         } else {
+            membersObj[user.uid] = {
+                isManager: user.isManager
+            }
+
             return membersCollection.doc(user.uid).create({
                 isManager: user.isManager
             })
@@ -80,7 +85,13 @@ exports.createGroup = functions.https.onCall( async (data, context) => {
         return null
     })
 
-    await memberCreationPromises
+    await Promise.all(memberCreationPromises)
+
+    return {
+        id: newGroup.id,
+        members: membersObj,
+        name: name
+    }
 })
 
 async function isGroupMember(groupId, auth) {
