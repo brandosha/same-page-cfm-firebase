@@ -134,6 +134,7 @@ var signUpForm = new Vue({
                 const secondSplit = split[1].split('.')
                 isValid = 
                     secondSplit.length > 1 &&
+                    secondSplit[0].length > 0 &&
                     secondSplit[1].length > 1
             }    
             

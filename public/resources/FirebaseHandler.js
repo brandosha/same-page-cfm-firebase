@@ -161,6 +161,7 @@ class FirebaseHandler {
 
         await this.auth.currentUser.getIdToken(true)
         var tokenInfo = await this.auth.currentUser.getIdTokenResult()
+        if (tokenInfo.claims.groups === undefined) return
         var groupIds = Object.keys(tokenInfo.claims.groups)
 
         await asyncForEach(groupIds, async groupId => {

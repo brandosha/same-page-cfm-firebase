@@ -18,9 +18,11 @@ var signUpForm = new Vue({
   },
   methods: {
     handleFormSubmit: function() {
+      var self = this
       loader.show()
       auth.signInWithEmailAndPassword(this.email, this.password)
       .catch(error => {
+        self.password = ''
         loader.hide()
         $('#invalid-credentials').show()
       })
