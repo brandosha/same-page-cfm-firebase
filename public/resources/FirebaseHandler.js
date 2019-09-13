@@ -179,6 +179,7 @@ class FirebaseHandler {
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
             groupsData[groupId].messagesObj = undefined
+            groupsData[groupId].messagesArr = undefined
         }
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
@@ -204,6 +205,7 @@ class FirebaseHandler {
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
             groupsData[groupId].messagesObj = undefined
+            groupsData[groupId].messagesArr = undefined
         }
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
