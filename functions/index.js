@@ -18,6 +18,71 @@ try {
 const firestore = admin.firestore()
 const auth = admin.auth()
 
+exports.createGroup = functions.https.onCall( async (data, context) => {
+    var name = data.name
+    var members = data.members
+
+    if (context.auth === undefined) {
+        throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
+    }
+    if (name === undefined || name === null || typeof name !== 'string' || (name = name.trim()).length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'No group name was supplied')
+    }
+    if (members === undefined || members === null) {
+        members = []
+    }
+
+    var usedMembers = {}
+    var uniqueMembers = []
+    members.forEach(member => {
+        if (usedMembers[member.email] !== true) {
+            uniqueMembers.push(member)
+            usedMembers[member.email] = true
+        }
+    })
+    members = uniqueMembers
+
+    const newGroup = firestore.collection('groups').doc()
+    await newGroup.create({
+        name: name
+    })
+
+    const membersCollection = newGroup.collection('members')
+    membersCollection.doc(context.auth.uid).create({
+        manager: true
+    })
+
+    var emailPromises = members.map(member => {
+        return auth.getUserByEmail(member.email)
+            .then(result => {
+                return {
+                    uid: result.uid,
+                    isManager: member.isManager
+                }
+            })
+            .catch(_error => {
+                return {
+                    email: member.email,
+                    uid: null
+                }
+            })
+    })
+
+    var users = await Promise.all(emailPromises)
+    var memberCreationPromises = users.map(user => {
+        if (user.uid === null) {
+            // TODO send invite email
+        } else {
+            return membersCollection.doc(user.uid).create({
+                isManager: user.isManager
+            })
+        }
+        return null
+    })
+
+    await memberCreationPromises
+})
+
 async function isGroupMember(groupId, auth) {
     var userSnapshot = await firestore.doc('groups/' + groupId + '/members/' + auth.uid).get()
     return userSnapshot.exists === true
@@ -41,7 +106,10 @@ exports.updateCustomClaims = functions.firestore
         return
     }
     var claims = user.customClaims
-    var userGroups = claims.groups !== undefined ? claims.groups : { }
+    var userGroups = 
+        claims !== undefined && 
+        claims.groups !== undefined ? 
+        claims.groups : { }
     
     if (change.after.exists) {
         userGroups[context.params.groupId] = {

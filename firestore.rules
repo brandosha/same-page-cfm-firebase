@@ -23,14 +23,10 @@ service cloud.firestore {
         request.resource.data.from == request.auth.uid &&
         !isEmptyString(request.resource.data.text) 
     }
-    function isValidGroup() {
-      return !isEmptyString(request.resource.data.name)
-    }
     
   	match /groups/{groupId} {
       allow read: if isMemberOfGroup(groupId)
       allow update: if isManagerOfGroup(groupId)
-      allow create: if request.auth != null && isValidGroup()
     }
     
     match /groups/{groupId}/messages/{messageId} {
