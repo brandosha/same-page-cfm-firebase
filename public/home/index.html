@@ -27,7 +27,7 @@
 </head>
   <body>
     <div id="vue-main" class="container-fluid p-0">
-      <div class="row">
+      <div class="row" v-if='!noGroups'>
         <div class="col-sm-4 pr-0 border-right border-dark" :class="{ 'd-none d-sm-block': isValidGroup }">
           <div v-for="(group, id) in firebaseData.groups">
             <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === id ? 'btn-light' : 'btn-dark'" :href="'#'+id">
@@ -47,12 +47,12 @@
               <div class="text-dark h5 m-0 d-xs-block d-sm-none text-capitalize">
                 {{ firebaseData.groups[groupId].name }}
               </div>
-              <div class="dropdown" data-toggle="dropdown">
-                <a class="nav-link text-dark h4 m-0" href="#" @click.prevent>&#8943;</a>
+              <div class="dropdown">
+                <a class="nav-link text-dark h4 m-0" data-toggle="dropdown" href="#" @click.prevent>&#8943;</a>
                 <div class="dropdown-menu">
-                  <a class="dropdown-item" href="#">test1</a>
-                  <a class="dropdown-item" href="#">test2</a>
-                  <a class="dropdown-item" href="#">test3</a>
+                  <a class="dropdown-item" href="#">Group members</a>
+                  <a class="dropdown-item" href="/create-group">Create group</a>
+                  <a class="dropdown-item" href="/sign-out">Sign out</a>
                 </div>
               </div>
             </nav>
@@ -71,6 +71,12 @@
         </div>
         <div class="col-sm-8 d-none d-sm-block" v-else>
           Select a group
+        </div>
+      </div>
+      <div class='container' v-else>
+        <div class="pt-3">
+          <div class="display-4">It looks like you aren't a member of any groups.</div>
+          <div class="lead mt-3">Join a group with a link or <a href="/create-group">create your own.</a></div>
         </div>
       </div>
     </div>

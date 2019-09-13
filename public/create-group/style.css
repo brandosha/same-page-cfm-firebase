@@ -1,0 +1,14 @@
+#toolbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: #F0F0F0;
+}
+
+.member-list-item {
+    transition: all 1s;
+}
+.member-list-enter, .member-list-leave-to {
+    opacity: 0;
+    transform: translatex(300px);
+}

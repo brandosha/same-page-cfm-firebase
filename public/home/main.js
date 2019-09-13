@@ -1,73 +1,81 @@
-var firebaseHandler;
-var mainUI;
-
 document.addEventListener('DOMContentLoaded', function() {
     auth = firebase.auth()
 
     auth.onAuthStateChanged(async user => {
         if (!user) {
             window.location.replace('/sign-in')
+            return
         }
 
-        firebaseHandler = new FirebaseHandler(firebase)
-
-        $(window).on('hashchange', event => {
-            var newHash = window.location.hash.slice(1)
-            mainUI.groupId = newHash
-            mainUI.$nextTick(_ => {
-                if (!mainUI.isValidGroup) return
-                $('#messages').scrollTop($('#messages')[0].scrollHeight);
-            })
-        })
-
-        await firebaseHandler.refreshAndConnectAll()
-
-        mainUI = new Vue({
-            el: '#vue-main',
-            data: {
-                firebaseData: firebaseHandler.dataObj,
-                groupId: window.location.hash.slice(1),
-                newMessage: ''
-            },
-            methods: {
-                sendMessage: function() {
-                    var messageText = this.newMessage.trim()
-                    this.newMessage = ''
-                    firebaseHandler.sendMessage(messageText, this.groupId)
-                    .then(_ => {
-                        if (!this.isValidGroup) return
-                        $('#messages').stop().animate({
-                            scrollTop: $('#messages')[0].scrollHeight
-                        });
-                    })
-                },
-                selectGroup: function(groupId) {
-                    window.location.hash = groupId
-                },
-                lastMessage: function(groupId) {
-                    var messages = this.firebaseData.groups[groupId].messagesArr
-                    if (messages.length == 0) return 'No messages'
-
-                    var message =  messages[messages.length - 1]
-                    return this.firebaseData.users[message.from].name + ': ' + message.text
-                }
-            },
-            computed: {
-                isValidGroup: function() {
-                    return firebaseHandler.groupExists(this.groupId)
-                }
-            },
-            created: function() {
-                this.$nextTick(_ => {
-                    if (this.isValidGroup) {
-                        $('#messages').scrollTop($('#messages')[0].scrollHeight);
-                    }
-                    loader.hide()
-                })
-            }
-        })
+        handleUI()
     })
 })
+
+var firebaseHandler
+var mainUI
+
+async function handleUI() {
+    firebaseHandler = new FirebaseHandler(firebase)
+
+    $(window).on('hashchange', event => {
+        var newHash = window.location.hash.slice(1)
+        mainUI.groupId = newHash
+        mainUI.$nextTick(_ => {
+            if (!mainUI.isValidGroup) return
+            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        })
+    })
+
+    await firebaseHandler.refreshAndConnectAll()
+
+    mainUI = new Vue({
+        el: '#vue-main',
+        data: {
+            firebaseData: firebaseHandler.dataObj,
+            groupId: window.location.hash.slice(1),
+            newMessage: ''
+        },
+        methods: {
+            sendMessage: function() {
+                var messageText = this.newMessage.trim()
+                this.newMessage = ''
+                firebaseHandler.sendMessage(messageText, this.groupId)
+                .then(_ => {
+                    if (!this.isValidGroup) return
+                    $('#messages').stop().animate({
+                        scrollTop: $('#messages')[0].scrollHeight
+                    });
+                })
+            },
+            selectGroup: function(groupId) {
+                window.location.hash = groupId
+            },
+            lastMessage: function(groupId) {
+                var messages = this.firebaseData.groups[groupId].messagesArr
+                if (messages.length == 0) return 'No messages'
+
+                var message =  messages[messages.length - 1]
+                return this.firebaseData.users[message.from].name + ': ' + message.text
+            }
+        },
+        computed: {
+            isValidGroup: function() {
+                return firebaseHandler.groupExists(this.groupId)
+            },
+            noGroups: function() {
+                return Object.keys(this.firebaseData.groups).length == 0
+            }
+        },
+        created: function() {
+            this.$nextTick(_ => {
+                if (this.isValidGroup) {
+                    $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                }
+                loader.hide()
+            })
+        }
+    })
+}
 
 var debug = new Vue({
     el: '#debug',
