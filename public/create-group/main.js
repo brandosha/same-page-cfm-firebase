@@ -113,7 +113,7 @@ function handleUI() {
                     }
                 })
 
-                functions.useFunctionsEmulator('http://localhost:5001')
+                // functions.useFunctionsEmulator('http://localhost:5001')
                 loader.show()
                 createGroup({
                     name: this.groupName,
@@ -121,14 +121,15 @@ function handleUI() {
                 })
                 .then(result => {
                     var newGroup = result.data
-                    var currentGroups = JSON.parse(localStorage.getItem('groups'))
+                    var currentGroups = localStorage.getItem('groups')
+                    currentGroups = currentGroups !== null ? JSON.parse(currentGroups) : { }
                     currentGroups[newGroup.id] = { 
                         members: newGroup.members,
                         name: newGroup.name
                     }
                     localStorage.setItem('groups', JSON.stringify(currentGroups))
 
-                    window.location.href = '/home'
+                    window.location.href = '/home/#created-group:' + newGroup.id
                 })
             },
             addMember: function() {

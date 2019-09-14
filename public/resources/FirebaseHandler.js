@@ -207,6 +207,34 @@ class FirebaseHandler {
         if (tokenInfo.claims.groups === undefined) return
         var groupIds = Object.keys(tokenInfo.claims.groups)
 
+        var self = this
+        function checkMatchingGroups() {
+            var hash = location.hash.slice(1)
+            if (!hash.includes('created-group')) return new Promise()
+            var newGroup = hash.split(':')[1]
+            if (newGroup === undefined) return new Promise()
+            
+            if (tokenInfo.claims.groups[newGroup] == undefined) {
+                return new Promise(resolve => {
+                    setTimeout(_ => {
+                        self.auth.currentUser.getIdToken(true)
+                        .then(_ => {
+                            self.auth.currentUser.getIdTokenResult()
+                            .then(result => {
+                                tokenInfo = result
+                                console.log('checking ' + newGroup + ' again', tokenInfo)
+                                checkMatchingGroups()
+                                .then(_ => {
+                                    resolve()
+                                })
+                            })
+                        })
+                    }, 500)
+                })
+            }
+        }
+        await checkMatchingGroups()
+
         var promises = groupIds.map(groupId => {
             return this.firestore.doc('groups/' + groupId).get()
                 .then(snapshot => {
