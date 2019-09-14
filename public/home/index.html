@@ -29,12 +29,16 @@
     <div id="vue-main" class="container-fluid p-0">
       <div class="row" v-if='!noGroups'>
         <div class="col-sm-4 pr-0 border-right border-dark" :class="{ 'd-none d-sm-block': isValidGroup }">
-          <div v-for="(group, id) in firebaseData.groups">
-            <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === id ? 'btn-light' : 'btn-dark'" :href="'#'+id">
+          <transition-group name="group-list" tag="div">
+          <div v-for="group in firebaseData.groupArr" :key="group.id" class="group-list-item">
+            <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === group.id ? 'btn-light' : 'btn-dark'" :href="'#'+group.id">
               <span class="h5 text-capitalize">{{ group.name }}</span>
-              <div class="text-truncate">{{ lastMessage(id) }}</div>
+              <div class="text-truncate">
+                {{ formatMessage(group.lastMessage) }}
+              </div>
             </a>
           </div>
+          </transition-group>
         </div>
         <div class="col-sm-8" v-if="isValidGroup">
           <div id="messages" class="container">
@@ -57,14 +61,24 @@
               </div>
             </nav>
             <div v-for="message in firebaseData.groups[groupId].messagesArr" v-if="message !== undefined">
-              <span class="text-capitalize">{{ firebaseData.users[message.from].name }}</span>: {{ message.text }}
+              {{ firebaseData.users[message.from].name }}: {{ message.text }}
             </div>
           </div>
           <div id="message-input">
             <form @submit.prevent="sendMessage" class="container-fluid">
               <div class="row form-group">
-                <input type="text" v-model="newMessage" class="form-control mx-3 col">
-                <input type="submit" value="Send" class="btn btn-primary mx-2 col-auto">
+                <input
+                  type="text"
+                  v-model="newMessage"
+                  class="form-control mx-3 col"
+                  :disabled="sendFormDisabled.input"
+                >
+                <input 
+                  type="submit" 
+                  value="Send" 
+                  class="btn btn-primary mx-2 col-auto"
+                  :disabled="sendFormDisabled.submit"
+                >
               </div>
             </form>
           </div>

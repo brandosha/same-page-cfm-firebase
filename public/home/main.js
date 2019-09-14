@@ -50,12 +50,9 @@ async function handleUI() {
             selectGroup: function(groupId) {
                 window.location.hash = groupId
             },
-            lastMessage: function(groupId) {
-                var messages = this.firebaseData.groups[groupId].messagesArr
-                if (messages.length == 0) return 'No messages'
-
-                var message =  messages[messages.length - 1]
-                return this.firebaseData.users[message.from].name + ': ' + message.text
+            formatMessage: function(lastMessage) {
+                if (lastMessage === undefined) return 'No messages'
+                return this.firebaseData.users[lastMessage.from].name + ': ' + lastMessage.text
             }
         },
         computed: {
@@ -64,6 +61,12 @@ async function handleUI() {
             },
             noGroups: function() {
                 return Object.keys(this.firebaseData.groups).length == 0
+            },
+            sendFormDisabled: function() {
+                return {
+                    input: this.firebaseData.offline,
+                    submit: this.firebaseData.offline || this.newMessage.trim().length === 0
+                }
             }
         },
         created: function() {

@@ -9,6 +9,10 @@
     border-radius: 0;
 }
 
+.group-list-item {
+    transition: all 1s;
+}
+
 #group-toolbar {
     position: fixed;
     top: 0;

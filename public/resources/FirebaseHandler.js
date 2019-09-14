@@ -11,6 +11,7 @@ class FirebaseHandler {
 
         this.dataObj = {
             groups: groups,
+            groupArr: [],
             users: { },
             uid: this.auth.currentUser.uid,
             offline: !navigator.onLine || offlineOverride
@@ -24,6 +25,7 @@ class FirebaseHandler {
         for (const groupId in this.dataObj.groups) {
             this.createMessagesArray(groupId)
         }
+        this.createGroupArray()
 
         window.addEventListener('offline', this.connectionStatusChanged.bind(this))
         window.addEventListener('online', this.connectionStatusChanged.bind(this))
@@ -100,7 +102,39 @@ class FirebaseHandler {
         this.dataObj.groups[groupId].messagesArr = messagesArr
     }
 
+    printGroupArr() {
+        this.dataObj.groupArr.forEach((group, index) => {
+            if (group.lastMessage) {
+                console.log(index, group.name, group.lastMessage.sent)
+            } else {
+                console.log(index, group.name, undefined)
+            }
+        })
+    }
+
+    createGroupArray() {
+        var groupArr = Object.keys(this.dataObj.groups).map(groupId => {
+            var group = this.dataObj.groups[groupId]
+            return {
+                id: groupId,
+                name: group.name,
+                lastMessage: group.messagesArr[group.messagesArr.length - 1]
+            }
+        })
+
+        groupArr = groupArr.sort((a, b) => {
+            let aTimeNum = a.lastMessage === undefined ? 0 : a.lastMessage.sent.getTime()
+            let bTimeNum = b.lastMessage === undefined ? 0 : b.lastMessage.sent.getTime()
+            return bTimeNum - aTimeNum
+        })
+
+        this.dataObj.groupArr = groupArr
+        this.printGroupArr()
+    }
+
     async refreshAndConnectAll() {
+        if (this.dataObj.offline) return
+
         var self = this
 
         await this.refreshGroups()
@@ -110,7 +144,7 @@ class FirebaseHandler {
             await self.refreshMessages(groupId)
             this.createMessagesArray(groupId)
 
-            var unsubscriber = this.firestore.collection('groups/' + groupId + '/messages')
+            var unsubscriber = this.firestore.collection('groups/' + groupId + '/messages').where('sent', '>', new Date())
             .onSnapshot(querySnapshot => {
                 querySnapshot.docChanges().forEach(change => {
                     var snapshot = change.doc
@@ -146,6 +180,8 @@ class FirebaseHandler {
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = messageObj
                         this.dataObj.groups[groupId].messagesArr.push(messageObj)
+
+                        this.newMessageInGroup(groupId)
                     }
                 })
 
@@ -153,7 +189,25 @@ class FirebaseHandler {
             })
             this.listenerUnsubscribers.push(unsubscriber)
         })
+        this.createGroupArray()
         await this.refreshUsers()
+    }
+
+    newMessageInGroup(groupId) {
+        var self = this
+
+        var updatedGroup
+        var updateIndex
+        this.dataObj.groupArr.forEach((group, index) => {
+            if (group.id !== groupId) return
+            var groupMessages = self.dataObj.groups[group.id].messagesArr
+            updatedGroup = group
+            updatedGroup.lastMessage = groupMessages[groupMessages.length - 1]
+            updateIndex = index
+        })
+
+        this.dataObj.groupArr.splice(updateIndex, 1)
+        this.dataObj.groupArr.unshift(updatedGroup)
     }
 
     async refreshGroups() {
@@ -298,6 +352,8 @@ class FirebaseHandler {
         messageObj.sent = now
         this.dataObj.groups[groupId].messagesObj[newDoc.id] = messageObj
         this.dataObj.groups[groupId].messagesArr[arrIndex].sent = now
+
+        this.newMessageInGroup(groupId)
     }
 }
 
