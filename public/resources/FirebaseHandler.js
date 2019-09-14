@@ -5,7 +5,7 @@ class FirebaseHandler {
         this.auth = firebase.auth()
         this.firestore = firebase.firestore()
         this.functions = firebase.functions()
-        this.functions.useFunctionsEmulator('http://localhost:5001')
+        // this.functions.useFunctionsEmulator('http://localhost:5001')
 
         var groups = getLocalObj('groups')
 
@@ -164,17 +164,20 @@ class FirebaseHandler {
         if (tokenInfo.claims.groups === undefined) return
         var groupIds = Object.keys(tokenInfo.claims.groups)
 
-        await asyncForEach(groupIds, async groupId => {
-            var groupData = await this.firestore.doc('groups/' + groupId).get()
-            groupData = groupData.data()
-            if (groupId in this.dataObj.groups) {
-                this.dataObj.groups[groupId].name = groupData.name
-            } else {
-                this.dataObj.groups[groupId] = {
-                    name: groupData.name
-                }
-            }
+        var promises = groupIds.map(groupId => {
+            return this.firestore.doc('groups/' + groupId).get()
+                .then(snapshot => {
+                    var groupData = snapshot.data()
+                    if (groupId in this.dataObj.groups) {
+                        this.dataObj.groups[groupId].name = groupData.name
+                    } else {
+                        this.dataObj.groups[groupId] = {
+                            name: groupData.name
+                        }
+                    }
+                })
         })
+        await Promise.all(promises)
 
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
@@ -210,19 +213,23 @@ class FirebaseHandler {
         localStorage.setItem('groups', JSON.stringify(groupsData))
     }
 
-    async refreshUsers() {
+    refreshUsers() {
         var userIds = this.getAssociatedUserIds()
         var self = this
-        await asyncForEach(userIds, async userId => {
-            var userData = await this.firestore.doc('users/' + userId).get()
-            userData = userData.data()
+        var promises = userIds.map(userId => {
+            return this.firestore.doc('users/' + userId).get()
+                .then(snapshot => {
+                    var userData = snapshot.data()
 
-            var userObj = {
-                name: userData.name
-            }
-            self.dataObj.users[userId] = userObj
-            localStorage.setItem('user_' + userId, JSON.stringify(userObj))
+                    var userObj = {
+                        name: userData.name
+                    }
+                    self.dataObj.users[userId] = userObj
+                    localStorage.setItem('user_' + userId, JSON.stringify(userObj))
+                })
         })
+
+        return Promise.all(promises)
     }
 
     groupExists(groupId) {
@@ -241,23 +248,26 @@ class FirebaseHandler {
         var messageIds = await listMessageIDs({groupId: groupId})
         messageIds = messageIds.data.documentIds
 
-        await asyncForEach(messageIds, async messageId => {
+        var promises = messageIds.map(messageId => {
             if (
                 this.dataObj.groups[groupId].messagesObj !== undefined && 
                 messageId in this.dataObj.groups[groupId].messagesObj
             ) {
                 messages[messageId] = this.dataObj.groups[groupId].messagesObj[messageId]
-                return
+                return null
             }
 
-            var snapshot = await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).get()
-            var messageData = snapshot.data()
-            messages[messageId] = {
-                from: messageData.from,
-                text: messageData.text,
-                sent: messageData.sent.toDate()
-            }
+            return this.firestore.doc('groups/' + groupId + '/messages/' + messageId).get()
+                .then(snapshot => {
+                    var messageData = snapshot.data()
+                    messages[messageId] = {
+                        from: messageData.from,
+                        text: messageData.text,
+                        sent: messageData.sent.toDate()
+                    }
+                })
         })
+        await Promise.all(promises)
 
         this.dataObj.groups[groupId].messagesObj = messages
         localStorage.setItem(groupId + '_messages', JSON.stringify(messages))
