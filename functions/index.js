@@ -11,7 +11,6 @@ try {
     });
 } catch (error) {
     // no credentials found
-    console.error(error)
     admin.initializeApp()
 }
 
