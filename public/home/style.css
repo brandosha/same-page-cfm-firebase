@@ -37,6 +37,7 @@
 #message-input {
     padding: 5px 0;
     margin-bottom: 0;
+    box-shadow: 0 -12px 10px -15px darkgray;
 }
 
 #group-ui-body {
