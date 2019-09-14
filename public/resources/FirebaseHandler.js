@@ -210,9 +210,9 @@ class FirebaseHandler {
         var self = this
         function checkMatchingGroups() {
             var hash = location.hash.slice(1)
-            if (!hash.includes('created-group')) return new Promise()
+            if (!hash.includes('created-group')) return new Promise(resolve => resolve())
             var newGroup = hash.split(':')[1]
-            if (newGroup === undefined) return new Promise()
+            if (newGroup === undefined) return new Promise(resolve => resolve())
             
             if (tokenInfo.claims.groups[newGroup] == undefined) {
                 return new Promise(resolve => {
