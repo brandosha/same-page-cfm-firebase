@@ -102,16 +102,6 @@ class FirebaseHandler {
         this.dataObj.groups[groupId].messagesArr = messagesArr
     }
 
-    printGroupArr() {
-        this.dataObj.groupArr.forEach((group, index) => {
-            if (group.lastMessage) {
-                console.log(index, group.name, group.lastMessage.sent)
-            } else {
-                console.log(index, group.name, undefined)
-            }
-        })
-    }
-
     createGroupArray() {
         var groupArr = Object.keys(this.dataObj.groups).map(groupId => {
             var group = this.dataObj.groups[groupId]
@@ -129,7 +119,6 @@ class FirebaseHandler {
         })
 
         this.dataObj.groupArr = groupArr
-        this.printGroupArr()
     }
 
     async refreshAndConnectAll() {
