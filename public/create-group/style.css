@@ -10,5 +10,26 @@
 }
 .member-list-enter, .member-list-leave-to {
     opacity: 0;
-    transform: translatex(300px);
 }
+.member-list-enter {
+    transform: translatex(-50px);
+}
+.member-list-leave-to {
+    transform: translatex(50px);
+}
+.member-list-leave-active {
+    position: absolute;
+    width: 100%;
+}
+
+/*
+@media (min-width: 992px) {
+    .member-list-leave-active { max-width: 960px; }
+}
+@media (min-width: 768px) {
+    .member-list-leave-active { max-width: 720px; }
+}
+@media (min-width: 576px) {
+    .member-list-leave-active { max-width: 540px; }
+}
+*/

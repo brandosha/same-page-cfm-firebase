@@ -47,51 +47,49 @@
           </div>
         </div>
 
-        <div class="my-4">
-          <label>
-            Group Members
-          </label>
-          <div class="pb-2">
-            <div class="input-group">
-              <input 
-                class="form-control"
-                type="text"
-                v-model="myEmail"
-                disabled
-              >
-              <div class="input-group-append">
-                <div class="input-group-text">
-                  <input type="checkbox" id="manager-toggle-self" disabled checked>
-                  <label class="pl-2 m-0" for="manager-toggle-self" disabled>
-                    Manager
-                  </label>
-                </div>
+        <label class="mt-2">
+          Group Members
+        </label>
+        <div class="pb-2">
+          <div class="input-group">
+            <input 
+              class="form-control"
+              type="text"
+              v-model="myEmail"
+              disabled
+            >
+            <div class="input-group-append">
+              <div class="input-group-text">
+                <input type="checkbox" id="manager-toggle-self" disabled checked>
+                <label class="pl-2 m-0" for="manager-toggle-self" disabled>
+                  Manager
+                </label>
               </div>
             </div>
           </div>
-          <transition-group name="member-list" tag="div">
-            <member-input 
-              v-for="(member, index) in memberInputs"
-              :member="member"
-              :display-feedback="submitted"
-              :key="member.key"
-              class="member-list-item"
-              @remove="memberInputs.splice(index,1)"
-            ></member-input>
-            <button
-              type="button"
-              class="btn btn-secondary member-list-item"
-              @click="addMember"
-              :key="-1"
-            >
-              Add Member
-            </button>
-          </transition-group>
         </div>
+        <transition-group name="member-list" tag="div">
+          <member-input 
+            v-for="(member, index) in memberInputs"
+            :member="member"
+            :display-feedback="submitted"
+            :key="member.key"
+            class="member-list-item"
+            @remove="memberInputs.splice(index,1)"
+          ></member-input>
+          <button
+            type="button"
+            class="btn btn-secondary member-list-item"
+            @click="addMember"
+            :key="-1"
+          >
+            Add Member
+          </button>
         
-        <div class="d-flex justify-content-center">
-          <input class="w-50 btn btn-lg btn-success" type="submit" value="Create Group">
-        </div>
+          <div class="d-flex justify-content-center mt-3 member-list-item" :key="-2">
+            <input class="w-50 btn btn-lg btn-success" type="submit" value="Create Group">
+          </div>
+        </transition-group>
       </form>
     </div>
 
