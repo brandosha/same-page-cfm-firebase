@@ -204,33 +204,28 @@ class FirebaseHandler {
 
         await this.auth.currentUser.getIdToken(true)
         var tokenInfo = await this.auth.currentUser.getIdTokenResult()
-        if (tokenInfo.claims.groups === undefined) return
-        var groupIds = Object.keys(tokenInfo.claims.groups)
+        var groupIds = []
+        if (tokenInfo.claims.groups !== undefined) {
+            groupIds = Object.keys(tokenInfo.claims.groups)
+        }
 
         var self = this
-        function checkMatchingGroups() {
-            var hash = location.hash.slice(1)
+        async function checkMatchingGroups() {
+            var hash = location.hash
             if (!hash.includes('created-group')) return new Promise(resolve => resolve())
             var newGroup = hash.split(':')[1]
             if (newGroup === undefined) return new Promise(resolve => resolve())
-            
-            if (tokenInfo.claims.groups[newGroup] == undefined) {
-                return new Promise(resolve => {
-                    setTimeout(_ => {
-                        self.auth.currentUser.getIdToken(true)
-                        .then(_ => {
-                            self.auth.currentUser.getIdTokenResult()
-                            .then(result => {
-                                tokenInfo = result
-                                console.log('checking ' + newGroup + ' again', tokenInfo)
-                                checkMatchingGroups()
-                                .then(_ => {
-                                    resolve()
-                                })
-                            })
-                        })
-                    }, 500)
-                })
+
+            while (
+                tokenInfo.claims.groups === undefined ||
+                tokenInfo.claims.groups[newGroup] === undefined
+            ) {
+                await new Promise(resolve => setTimeout(resolve, 500))
+                await self.auth.currentUser.getIdToken(true)
+                tokenInfo = await self.auth.currentUser.getIdTokenResult()
+                if (tokenInfo.claims.groups !== undefined) {
+                    groupIds = Object.keys(tokenInfo.claims.groups)
+                }
             }
         }
         await checkMatchingGroups()
