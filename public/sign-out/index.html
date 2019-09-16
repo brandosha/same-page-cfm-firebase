@@ -35,6 +35,7 @@
         auth = firebase.auth()
         auth.signOut()
         .then(result => {
+          localStorage.clear()
           window.location.replace('/')
         })
     })
