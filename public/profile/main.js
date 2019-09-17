@@ -7,6 +7,7 @@ window.onload = function() {
         }
 
         myUid = user.uid
+        myEmail = user.email
 
         handleUI()
     })
@@ -14,6 +15,7 @@ window.onload = function() {
 
 var mainUI
 var myUid
+var myEmail
 
 async function handleUI() {
     var firestore = firebase.firestore()
@@ -24,6 +26,7 @@ async function handleUI() {
         el: '#vue-main',
         data: {
             name: profileData.name,
+            email: myEmail,
             editing: false
         },
         methods: {
