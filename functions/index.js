@@ -48,7 +48,7 @@ exports.createGroup = functions.https.onCall( async (data, context) => {
 
     const membersCollection = newGroup.collection('members')
     membersCollection.doc(context.auth.uid).create({
-        manager: true
+        isManager: true
     })
 
     var emailPromises = members.map(member => {
