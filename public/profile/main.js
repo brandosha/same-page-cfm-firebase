@@ -47,7 +47,7 @@ async function handleUI() {
             }
         },
         watch: {
-            'editing': function() {
+            editing: function() {
                 if (!this.editing) {
                     this.name = profileData.name
                 }
