@@ -163,15 +163,15 @@ exports.listMessageIDs = functions.https.onCall( async (data, context) => {
     }
 })
 
-exports.searchEmailAddress = functions.https.onCall( async (data, context) => {
-    const emailAddr = data.emailAddress
+exports.searchEmailAddresses = functions.https.onCall( async (data, context) => {
+    const emailAddresses = data.emailAddresses
     const groupId = data.groupId
 
     if (context.auth === undefined) {
         throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
     }
-    if (emailAddr === undefined || emailAddr === null) {
-        throw new functions.https.HttpsError('invalid-argument', 'No email adress was supplied')
+    if (emailAddresses === undefined || emailAddresses === null || !Array.isArray(emailAddresses) || emailAddresses.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'No email adresses were supplied')
     }
     if (groupId === undefined || groupId === null) {
         throw new functions.https.HttpsError('invalid-argument', 'No group id was supplied')
@@ -182,8 +182,30 @@ exports.searchEmailAddress = functions.https.onCall( async (data, context) => {
         throw new functions.https.HttpsError('permission-denied', 'You are not a manger of this group')
     }
 
-    try {
-        var userSearch = await auth.getUserByEmail(emailAddr)
+    var promises = []
+    emailAddresses.forEach(emailAddr => {
+        promises.push(
+            auth.getUserByEmail(emailAddr)
+            .then(result => {
+                return {
+                    email: emailAddr,
+                    uid: result.uid
+                }
+            })
+            .catch(_ => {
+                return {
+                    email: emailAddr,
+                    uid: null
+                }
+            })
+        )
+    })
+
+    var searchResults = await Promise.all(promises)
+    return searchResults
+
+    /*try {
+        var userSearch = await 
 
         return {
             input: data,
@@ -197,5 +219,5 @@ exports.searchEmailAddress = functions.https.onCall( async (data, context) => {
             }
         }
         throw new functions.https.HttpsError('unknown', error.message)
-    }
+    }*/
 })
