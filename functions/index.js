@@ -7,7 +7,7 @@ try {
     admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
         // Update to your database url if necessary
-        databaseURL: "https://same-page-cfm.firebaseio.com"
+        databaseURL: "https://samepagecfm.firebaseio.com"
     });
 } catch (error) {
     // no credentials found
