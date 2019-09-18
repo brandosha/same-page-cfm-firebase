@@ -27,10 +27,10 @@
   <body>
     <div id="vue-main" class="container p-3 mt-5">
       <form @submit.prevent="updateUser">
-        <div class="d-flex justify-content-right">
+        <div class="d-flex justify-content-end">
           <button
             type="button"
-            class="btn btn-primary ml-auto"
+            class="btn btn-primary"
             :class="editing ? 'btn-danger' : 'btn-primary'"
             @click="editing = !editing"
           >
