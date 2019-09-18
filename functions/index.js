@@ -123,7 +123,7 @@ exports.updateCustomClaims = functions.firestore
     
     if (change.after.exists) {
         userGroups[context.params.groupId] = {
-            isManager: change.after.data.isManager
+            isManager: change.after.data().isManager
         }
     } else {
         userGroups[context.params.groupId] = undefined
@@ -203,21 +203,4 @@ exports.searchEmailAddresses = functions.https.onCall( async (data, context) => 
 
     var searchResults = await Promise.all(promises)
     return searchResults
-
-    /*try {
-        var userSearch = await 
-
-        return {
-            input: data,
-            resultUid: userSearch.uid
-        }
-    } catch (error) {
-        if (error.code === 'auth/user-not-found') {
-            return {
-                input: data,
-                resultUid: undefined
-            }
-        }
-        throw new functions.https.HttpsError('unknown', error.message)
-    }*/
 })
