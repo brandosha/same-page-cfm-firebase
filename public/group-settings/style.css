@@ -1,0 +1,16 @@
+.member-list-item {
+    transition: all 1s;
+}
+.member-list-enter, .member-list-leave-to {
+    opacity: 0;
+}
+.member-list-enter {
+    transform: translatex(-50px);
+}
+.member-list-leave-to {
+    transform: translatex(50px);
+}
+.member-list-leave-active {
+    position: absolute;
+    width: 100%;
+}
