@@ -234,6 +234,7 @@ class FirebaseHandler {
             return this.firestore.doc('groups/' + groupId).get()
                 .then(snapshot => {
                     var groupData = snapshot.data()
+                    if (groupData === undefined) return
                     if (groupId in this.dataObj.groups) {
                         this.dataObj.groups[groupId].name = groupData.name
                     } else {
