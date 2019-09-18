@@ -230,11 +230,16 @@ class FirebaseHandler {
         }
         await checkMatchingGroups()
 
+        var groupsDeleted = { }
+        for (const groupId in this.dataObj.groups) {
+            groupsDeleted[groupId] = true
+        }
         var promises = groupIds.map(groupId => {
+            groupsDeleted[groupId] = false
             return this.firestore.doc('groups/' + groupId).get()
                 .then(snapshot => {
                     var groupData = snapshot.data()
-                    if (groupData === undefined) return
+                    if (groupData === undefined) throw new Error("Group " + groupId + " doesn't exist")
                     if (groupId in this.dataObj.groups) {
                         this.dataObj.groups[groupId].name = groupData.name
                     } else {
@@ -243,8 +248,17 @@ class FirebaseHandler {
                         }
                     }
                 })
+                .catch(_ => {
+                    delete this.dataObj.groups[groupId]
+                })
         })
         await Promise.all(promises)
+
+        for (const groupId in this.dataObj.groups) {
+            if(groupsDeleted[groupId]) {
+                delete this.dataObj.groups[groupId]
+            }
+        }
 
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
@@ -332,6 +346,9 @@ class FirebaseHandler {
                         text: messageData.text,
                         sent: messageData.sent.toDate()
                     }
+                })
+                .catch(error => {
+                    console.error(error)
                 })
         })
         await Promise.all(promises)
