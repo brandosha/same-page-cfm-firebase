@@ -52,7 +52,7 @@ async function handleUI() {
             },
             formatMessage: function(lastMessage) {
                 if (lastMessage === undefined) return 'No messages'
-                return this.firebaseData.users[lastMessage.from].name + ': ' + lastMessage.text
+                return this.firebaseData.users[lastMessage.from].name.split(' ')[0] + ': ' + lastMessage.text
             }
         },
         computed: {
