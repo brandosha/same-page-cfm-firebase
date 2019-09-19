@@ -19,6 +19,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
     <script src="/resources/loader.js"></script>
+    <script src="/resources/scriptures.js"></script>
     <script src="/resources/FirebaseHandler.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -61,7 +62,7 @@
               </div>
             </nav>
             <div v-for="message in firebaseData.groups[groupId].messagesArr" v-if="message !== undefined">
-              {{ firebaseData.users[message.from].name }}: {{ message.text }}
+              {{ firebaseData.users[message.from].name }}: <span v-html="message.html"></span>
             </div>
           </div>
           <div id="message-input">

@@ -91,7 +91,8 @@ class FirebaseHandler {
             messagesArr.push({
                 from: messageObj.from,
                 sent: messageObj.sent,
-                text: messageObj.text
+                text: messageObj.text,
+                html: this.parseMessageForScriptureRef(messageObj.text)
             })
         }
 
@@ -164,6 +165,7 @@ class FirebaseHandler {
                         var messageObj = {
                             from: messageData.from,
                             text: messageData.text,
+                            html: this.parseMessageForScriptureRef(messageData.text),
                             sent: messageData.sent.toDate()
                         }
 
@@ -347,7 +349,6 @@ class FirebaseHandler {
                     chapterInt > scripture.chapters
                 ) return
 
-
                 var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
 
                 if (!isNaN(verseInt)) {
@@ -400,6 +401,7 @@ class FirebaseHandler {
                     messages[messageId] = {
                         from: messageData.from,
                         text: messageData.text,
+                        html: this.parseMessageForScriptureRef(messageData.text),
                         sent: messageData.sent.toDate()
                     }
                 })
@@ -429,7 +431,8 @@ class FirebaseHandler {
         var arrIndex = this.dataObj.groups[groupId].messagesArr.length
         this.dataObj.groups[groupId].messagesArr.push({
             from: this.dataObj.uid,
-            text: text
+            text: text,
+            html: this.parseMessageForScriptureRef(text)
         })
 
         var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
@@ -458,7 +461,7 @@ function indicesOf(str, search) {
         resStr = resStr.substr(afterOccurence)
         actualIndex += afterOccurence
     }
-    return indices
+    return indices.sort((a,b) => a-b)
 }
 
 async function asyncForEach(array, callback) {
