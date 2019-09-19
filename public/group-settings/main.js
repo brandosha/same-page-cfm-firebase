@@ -130,7 +130,6 @@ async function handleUI() {
                 var promises = []
 
                 if (this.groupName.trim() !== this.firebaseData.groups[groupId].name.trim()) {
-                    console.log('updating ' + 'groups/' + this.groupId)
                     promises.push(
                         firestore.doc('groups/' + this.groupId).update({
                             name: this.groupName.trim()
@@ -142,18 +141,15 @@ async function handleUI() {
                     var newMem = newMemberData[memberId]
                     var oldMem = oldMemberData[memberId]
                     if (this.deletedMembers[memberId]) {
-                        console.log('deleting ' + 'groups/' + this.groupId + '/members/' + memberId)
                         promises.push(
                             firestore.doc('groups/' + this.groupId + '/members/' + memberId).delete()
                         )
                     } else if (oldMem.isManager !== newMem.isManager) {
-                        console.log('updating ' + 'groups/' + this.groupId + '/members/' + memberId)
                         promises.push(
                             firestore.doc('groups/' + this.groupId + '/members/' + memberId).update({
                                 isManager: newMem.isManager
                             })
                         )
-                        console.log(memberId, 'isManager now', newMem.isManager)
                     }
                 }
 
@@ -174,13 +170,11 @@ async function handleUI() {
 
                 emailUids.data.forEach(result => {
                     if (result.uid in oldMemberData || result.uid === null) return
-                    console.log('creating ' + 'groups/' + this.groupId + '/members/' + result.uid)
                     promises.push(
                         firestore.doc('groups/' + this.groupId + '/members/' + result.uid).set({
                             isManager: memInputsObj[result.email]
                         })
                     )
-                    console.log(result.email, result.uid)
                 })
 
                 await Promise.all(promises)
