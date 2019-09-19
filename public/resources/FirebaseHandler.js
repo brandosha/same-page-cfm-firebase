@@ -325,6 +325,54 @@ class FirebaseHandler {
         return groupId in this.dataObj.groups
     }
 
+    parseMessageForScriptureRef(message) {
+        var htmlStr = message
+        htmlStr = htmlStr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        scriptures.forEach(scripture => {
+            var nameLength = scripture.name.length
+            var startIndices = indicesOf(htmlStr.toLowerCase(), scripture.name)
+            var addedChars = 0
+            startIndices.forEach(startInd => {
+                var startInd = startInd + addedChars
+                var ref = htmlStr.slice(startInd+nameLength+1).split(/[\s,.;'"]+/)[0]
+                var splitRef = ref.split(':')
+                var chapter = splitRef[0]
+                var chapterInt = parseInt(chapter)
+                var verse = splitRef[1]
+                var verseInt = parseInt(verse)
+
+                if (
+                    isNaN(chapterInt) || 
+                    chapterInt.toString() !== chapter ||
+                    chapterInt > scripture.chapters
+                ) return
+
+
+                var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
+
+                if (!isNaN(verseInt)) {
+                    if (verseInt > scripture.verses[chapterInt-1]) return
+                    href += '.' + verseInt + '#' + verseInt
+                }
+
+                var endInd = startInd+nameLength+1+ref.length
+                htmlStr = insert(
+                    htmlStr,
+                    '</a>',
+                    endInd
+                )
+                htmlStr = insert(
+                    htmlStr,
+                    '<a href="' + href + '" target="_blank">',
+                    startInd
+                )
+
+                addedChars += href.length + 31
+            })
+        })
+        return htmlStr
+    }
+
     async refreshMessages(groupId) {
         if (this.dataObj.offline) return
         if (!this.groupExists(groupId)) {
@@ -393,6 +441,24 @@ class FirebaseHandler {
 
         this.newMessageInGroup(groupId)
     }
+}
+
+function insert(str, insertion, index) {
+    return str.substr(0, index) + insertion + str.substr(index)
+}
+
+function indicesOf(str, search) {
+    var indices = []
+    var resStr = str
+    var newIndex
+    var actualIndex = 0
+    while ((newIndex = resStr.indexOf(search)) !== -1) {
+        var afterOccurence = newIndex + search.length
+        indices.push(actualIndex + newIndex)
+        resStr = resStr.substr(afterOccurence)
+        actualIndex += afterOccurence
+    }
+    return indices
 }
 
 async function asyncForEach(array, callback) {
