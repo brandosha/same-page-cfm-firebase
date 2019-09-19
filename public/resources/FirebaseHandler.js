@@ -336,24 +336,30 @@ class FirebaseHandler {
             var addedChars = 0
             startIndices.forEach(startInd => {
                 var startInd = startInd + addedChars
-                var ref = htmlStr.slice(startInd+nameLength+1).split(/[\s,.;'"]+/)[0]
+                var ref = htmlStr.slice(startInd+nameLength+1).split(/[^,0-9:-]/)[0]
                 var splitRef = ref.split(':')
                 var chapter = splitRef[0]
                 var chapterInt = parseInt(chapter)
-                var verse = splitRef[1]
-                var verseInt = parseInt(verse)
+                var versesRef = splitRef[1]
+                var verseInt = parseInt(versesRef)
 
                 if (
                     isNaN(chapterInt) || 
                     chapterInt.toString() !== chapter ||
+                    chapterInt < 1 ||
                     chapterInt > scripture.chapters
                 ) return
 
                 var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
 
-                if (!isNaN(verseInt)) {
-                    if (verseInt > scripture.verses[chapterInt-1]) return
-                    href += '.' + verseInt + '#' + verseInt
+                if (/[,0-9:-]/.test(versesRef)) {
+                    var verses = versesRef.split(/[,:-]/)
+                    var validVerses = verses.reduce((prev, verse) => {
+                        var verse = parseInt(verse)
+                        return prev && !isNaN(verse) && verse > 0 && verse <= scripture.verses[chapterInt-1]
+                    }, true)
+                    if (!validVerses) return
+                    href += '.' + versesRef + '#' + verses[0]
                 }
 
                 var endInd = startInd+nameLength+1+ref.length
