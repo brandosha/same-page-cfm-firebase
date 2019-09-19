@@ -215,6 +215,7 @@ class FirebaseHandler {
             if (!hash.includes('created-group')) return new Promise(resolve => resolve())
             var newGroup = hash.split(':')[1]
             if (newGroup === undefined) return new Promise(resolve => resolve())
+            location.hash = ''
 
             while (
                 tokenInfo.claims.groups === undefined ||
@@ -264,6 +265,7 @@ class FirebaseHandler {
         if (hash.includes('left-group')) {
             var leftId = hash.split(':')[1]
             delete this.dataObj.groups[leftId]
+            location.hash = ''
         }
 
         var groupsData = copyOf(this.dataObj.groups)
