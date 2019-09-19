@@ -187,7 +187,11 @@ async function handleUI() {
                 location.href = '/home'
             },
             leaveGroup: function() {
-
+                loader.show()
+                firestore.doc('groups/' + this.groupId + '/members/' + myUid).delete()
+                .then(_ => {
+                    location.href = '/home/#left-group:' + this.groupId
+                })
             },
             addMember: function() {
                 this.memberInputs.push({

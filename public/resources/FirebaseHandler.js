@@ -260,6 +260,12 @@ class FirebaseHandler {
             }
         }
 
+        var hash = location.hash
+        if (hash.includes('left-group')) {
+            var leftId = hash.split(':')[1]
+            delete this.dataObj.groups[leftId]
+        }
+
         var groupsData = copyOf(this.dataObj.groups)
         for (const groupId in groupsData) {
             groupsData[groupId].messagesObj = undefined
