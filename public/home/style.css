@@ -27,7 +27,7 @@
 }
 
 #messages {
-    padding-top: 3.5em;
+    padding-top: 4em;
     height: calc(100vh - 4.25em);
     overflow: scroll;
     word-wrap: break-word;
