@@ -28,7 +28,7 @@
   <body>
     <div id="vue-main" class="container-fluid p-0">
       <div class="row" v-if='!noGroups'>
-        <div class="col-sm-4 pr-0 border-right border-dark" :class="{ 'd-none d-sm-block': isValidGroup }">
+        <div id="group-list" class="col-sm-4 pr-0 border-right border-dark" :class="{ 'd-none d-sm-block': isValidGroup }">
           <transition-group name="group-list" tag="div">
           <div v-for="group in firebaseData.groupArr" :key="group.id" class="group-list-item">
             <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === group.id ? 'btn-light' : 'btn-dark'" :href="'#'+group.id">

@@ -3,6 +3,11 @@
     height: 100vh;
 }
 
+#group-list {
+    overflow: scroll;
+    height: 100vh;
+}
+
 .group-btn {
     border: none;
     text-align: left;
@@ -21,12 +26,6 @@
     background: #f0f0f0;
 }
 
-@media (min-width: 576px) {
-    #group-toolbar {
-        width: calc(66.66% + 5px);
-    }
-}
-
 #messages {
     padding-top: 3.5em;
     height: calc(100vh - 3em);
@@ -38,6 +37,19 @@
     padding: 5px 0;
     margin-bottom: 0;
     box-shadow: 0 -12px 10px -15px darkgray;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+}
+
+@media (min-width: 576px) {
+    #group-toolbar {
+        width: calc(66.66% + 5px);
+    }
+    #message-input {
+        width: 66.66%;
+    }
 }
 
 #group-ui-body {
