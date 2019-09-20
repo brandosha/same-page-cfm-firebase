@@ -15,8 +15,6 @@ var myEmail
 var mainUI
 
 function handleUI() {
-    loader.hide()
-
     Vue.component('member-input', {
         props: ['member', 'displayFeedback'],
         template: `
@@ -152,4 +150,7 @@ function handleUI() {
             }
         }
     })
+    
+    handleFullPageLinks()
+    loader.hide()
 }

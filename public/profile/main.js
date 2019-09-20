@@ -17,6 +17,7 @@ var mainUI
 var myUid
 var myEmail
 
+
 async function handleUI() {
     var firestore = firebase.firestore()
     var profileDoc = await firestore.doc('users/' + myUid).get()
@@ -58,5 +59,6 @@ async function handleUI() {
         }
     })
 
+    handleFullPageLinks()
     loader.hide()
 }

@@ -1,3 +1,5 @@
+
+
 var auth
 document.addEventListener('DOMContentLoaded', () => {
   auth = firebase.auth()
@@ -30,3 +32,4 @@ var signUpForm = new Vue({
   }
 })
 
+handleFullPageLinks()

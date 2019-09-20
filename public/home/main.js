@@ -21,6 +21,7 @@ async function handleUI() {
         var newHash = window.location.hash.slice(1)
         mainUI.groupId = newHash
         mainUI.$nextTick(_ => {
+            handleFullPageLinks()
             if (!mainUI.isValidGroup) return
             $('#messages').scrollTop($('#messages')[0].scrollHeight);
         })
@@ -74,6 +75,7 @@ async function handleUI() {
                 if (this.isValidGroup) {
                     $('#messages').scrollTop($('#messages')[0].scrollHeight);
                 }
+                handleFullPageLinks()
                 loader.hide()
             })
         }
@@ -129,4 +131,13 @@ $(document).mousemove(event => {
         $('#debug-body').height(newHeight)
         $('#debug-top').css('bottom', newHeight + 'px')
     }
+})
+
+function resizeFullHeight() {
+    $('.window-height').outerHeight(window.innerHeight)
+}
+resizeFullHeight()
+$(window).resize(_ => {
+    if (fullPage) setTimeout(resizeFullHeight, 500)
+    else resizeFullHeight()
 })

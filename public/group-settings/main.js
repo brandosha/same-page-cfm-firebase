@@ -22,6 +22,7 @@ var myUid
 var groupId
 var firebaseHandler
 
+
 async function handleUI() {
     await firebaseHandler.refreshGroups()
     await firebaseHandler.refreshGroupMembers(groupId)
@@ -238,5 +239,6 @@ async function handleUI() {
         }
     })
 
+    handleFullPageLinks()
     loader.hide()
 }

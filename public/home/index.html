@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Home</title>
 
     <!-- update the version number as needed -->
@@ -21,15 +22,16 @@
     <script src="/resources/loader.js"></script>
     <script src="/resources/scriptures.js"></script>
     <script src="/resources/FirebaseHandler.js"></script>
+    <script src="/resources/fullPageLinkHandling.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/resources/loader.css">
     <link rel="stylesheet" href="style.css">
 </head>
   <body>
-    <div id="vue-main" class="container-fluid p-0">
+    <div id="vue-main" class="container-fluid p-0 window-height">
       <div class="row" v-if='!noGroups'>
-        <div id="group-list" class="col-sm-4 pr-0 border-right border-dark" :class="{ 'd-none d-sm-block': isValidGroup }">
+        <div id="group-list" class="col-sm-4 pr-0 border-right border-dark window-height" :class="{ 'd-none d-sm-block': isValidGroup }">
           <transition-group name="group-list" tag="div">
           <div v-for="group in firebaseData.groupArr" :key="group.id" class="group-list-item">
             <a class="btn w-100 border-bottom group-btn px-3 py-1" :class="groupId === group.id ? 'btn-light' : 'btn-dark'" :href="'#'+group.id">
@@ -42,7 +44,7 @@
           </transition-group>
         </div>
         <div class="col-sm-8" v-if="isValidGroup">
-          <div id="messages" class="container">
+          <div id="messages" class="container window-height">
             <nav id="group-toolbar" class="d-flex p-1 align-items-center justify-content-between">
               <div>
                 <a class="nav-link text-dark h5 m-0 d-xs-block d-sm-none" href="#">

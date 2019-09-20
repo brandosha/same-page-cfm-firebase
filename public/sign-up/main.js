@@ -188,3 +188,4 @@ var signUpForm = new Vue({
     }
 })
 
+handleFullPageLinks()
