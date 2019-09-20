@@ -28,7 +28,8 @@
 
 #messages {
     padding-top: 4em;
-    height: calc(100vh - 4.25em);
+    height: 100vh;
+    padding-bottom: 4.25em;
     overflow: scroll;
     word-wrap: break-word;
 }
@@ -37,6 +38,7 @@
     padding: 5px 0;
     margin-bottom: 0;
     box-shadow: 0 -12px 10px -15px darkgray;
+    background: white;
     position: fixed;
     bottom: 0;
     right: 0;

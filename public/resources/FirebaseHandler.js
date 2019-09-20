@@ -351,20 +351,23 @@ class FirebaseHandler {
                 ) return
 
                 var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
-
+                var trailingComma = 0
                 if (/[,0-9:-]/.test(versesRef)) {
                     var verses = versesRef.split(/[,:-]/)
                     var validVerses = verses.reduce((prev, verse, index) => {
                         var verse = parseInt(verse)
                         var lastVerse = index === verses.length - 1
-                        if (lastVerse && versesRef[versesRef.length - 1] === ',') return prev
+                        if (lastVerse && versesRef[versesRef.length - 1] === ',') {
+                            trailingComma = -1
+                            return prev
+                        }
                         return prev && !isNaN(verse) && verse > 0 && verse <= scripture.verses[chapterInt-1]
                     }, true)
                     if (!validVerses) return
                     href += '.' + versesRef + '#' + verses[0]
                 }
 
-                var endInd = startInd+nameLength+1+ref.length
+                var endInd = startInd+nameLength+1+ref.length+trailingComma
                 htmlStr = insert(
                     htmlStr,
                     '</a>',
