@@ -52,6 +52,9 @@
     #message-input {
         width: 66.66%;
     }
+    #messages {
+        height: calc(100vh - 10px);
+    }
 }
 
 #group-ui-body {
