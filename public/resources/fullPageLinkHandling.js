@@ -14,7 +14,7 @@ function handleFullPageLinks() {
             )
         ) {
             event.preventDefault()
-            location.href = newLocation
+            if (navigator.onLine) location.href = newLocation
         }
     })
 }

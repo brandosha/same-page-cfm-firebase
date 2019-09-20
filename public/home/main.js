@@ -68,6 +68,10 @@ async function handleUI() {
                     input: this.firebaseData.offline,
                     submit: this.firebaseData.offline || this.newMessage.trim().length === 0
                 }
+            },
+            disabledIfOffline: function() {
+                if (this.firebaseData.offline) return 'disabled'
+                return ''
             }
         },
         created: function() {
