@@ -1,5 +1,6 @@
 body {
     overflow: hidden;
+    transition: background 0.25s;
 }
 
 #vue-main {
@@ -28,6 +29,7 @@ body {
     right: 0;
     width: 100%;
     background: #f0f0f0;
+    transition: background 0.25s;
 }
 
 #messages {
@@ -43,6 +45,7 @@ body {
     margin-bottom: 0;
     box-shadow: 0 -12px 10px -15px darkgray;
     background: white;
+    transition: background 0.25s;
     position: fixed;
     bottom: 0;
     right: 0;
@@ -87,4 +90,29 @@ body {
 
 #debug-resize-control {
     cursor: row-resize
+}
+
+@media (prefers-color-scheme: dark) {
+    body, .full-page-container {
+        background: black;
+        color: #cccccc;
+    }
+
+    #message-input {
+        background: black;
+        box-shadow: none;
+    }
+
+    .form-control, .form-control:focus {
+        background: #111111;
+        color: #aaaaaa;
+        border-color: #222222;
+    }
+
+    #group-toolbar { background: #111111; }
+    .form-control:disabled { background: #050505; }
+    .text-dark { color: #bbbbbb!important; }
+    .btn-light { background: #bbbbbb; }
+    .btn-light:hover { background: #aaaaaa; }
+    
 }
