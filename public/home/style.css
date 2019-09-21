@@ -1,6 +1,5 @@
 body {
     overflow: hidden;
-    transition: background 0.25s;
 }
 
 #vue-main {
@@ -93,26 +92,22 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-    body, .full-page-container {
-        background: black;
-        color: #cccccc;
-    }
-
     #message-input {
         background: black;
         box-shadow: none;
     }
 
-    .form-control, .form-control:focus {
-        background: #111111;
-        color: #aaaaaa;
-        border-color: #222222;
-    }
-
     #group-toolbar { background: #111111; }
-    .form-control:disabled { background: #050505; }
-    .text-dark { color: #bbbbbb!important; }
-    .btn-light { background: #bbbbbb; }
-    .btn-light:hover { background: #aaaaaa; }
-    
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+    #group-toolbar {
+        background: rgba(240, 240, 240, 0.5);
+        -webkit-backdrop-filter: blur(30px);
+    }
+    @media (prefers-color-scheme: dark) {
+        #group-toolbar {
+            background: rgba(30, 30, 30, 0.5);
+        }
+    }
 }

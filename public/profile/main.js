@@ -47,7 +47,7 @@ async function handleUI() {
         computed: {
             canSave: function() {
                 return this.name.trim().length > 0 &&
-                    this.name !== profileData.name
+                    this.name.trim() !== profileData.name.trim()
             }
         },
         watch: {
