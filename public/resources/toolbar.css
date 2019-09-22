@@ -12,10 +12,11 @@
     }
 }
 
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+@supports ((-webkit-backdrop-filter: blur(30px)) or (backdrop-filter: blur(30px))) {
     #toolbar {
         background: rgba(240, 240, 240, 0.5);
         -webkit-backdrop-filter: blur(30px);
+        backdrop-filter: blur(30px);
     }
     @media (prefers-color-scheme: dark) {
         #toolbar {
