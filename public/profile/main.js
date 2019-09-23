@@ -17,43 +17,115 @@ var mainUI
 var myUid
 var myEmail
 
-
 async function handleUI() {
+    var storage = firebase.storage()
     var firestore = firebase.firestore()
     var profileDoc = await firestore.doc('users/' + myUid).get()
     var profileData = profileDoc.data()
 
+    console.log(profileDoc, profileData)
+    if (profileData.hasAvatar) {
+        var avatarRef = storage.ref().child('avatars').child(myUid)
+        var avatarUrl = await avatarRef.getDownloadURL()
+        console.log(avatarUrl)
+    }
+
+    var uploadModal = $('#upload-modal')
+    var uploadCrop = $('#croppie')
+    uploadCrop.croppie({
+        viewport: {
+            width: 200,
+            height: 200,
+            type: 'circle'
+        },
+        boundary: {
+            width: 250,
+            height: 250
+        }
+    })
+
     mainUI = new Vue({
         el: '#vue-main',
         data: {
-            name: profileData.name,
+            avatar: profileData.hasAvatar ? avatarUrl : null,
+            newAvatarData: null,
             email: myEmail,
+            name: profileData.name,
             editing: false
         },
         methods: {
-            saveEdits: function() {
+            initials: function() {
+                var name = this.name
+                var names = name.split(' ')
+                if (names.length === 1) {
+                    return name.substr(0, 1).toUpperCase()
+                } else {
+                    return (names[0].substr(0, 1) + names[names.length - 1].substr(0, 1)).toUpperCase()
+                }
+            },
+            imgUpload: function(event) {
+                var input = event.target
+                if (input.files && input.files[0]) {
+                    uploadModal.modal('show')
+                    uploadModal.on('shown.bs.modal', _ => {
+                        var reader = new FileReader()
+                        reader.onload = function (e) {
+                            uploadCrop.croppie('bind', {
+                                url: e.target.result
+                            })
+                        }
+                        reader.readAsDataURL(input.files[0])
+                    })
+                }
+            },
+            handleUploadedImage: function() {
+                uploadCrop.croppie('result', {
+                    type: 'base64',
+                    circle: true
+                })
+                .then(result => {
+                    this.newAvatarData = result
+                    uploadModal.modal('hide')
+                })
+            },
+            saveEdits: async function() {
                 loader.show()
 
                 if (this.canSave) {
-                    firestore.doc('users/' + myUid).set({
+                    var avatar = this.newAvatarData
+                    var myAvatarRef = storage.ref().child('avatars').child(myUid)
+
+                    var newData = {
                         name: this.name.trim()
-                    })
-                    .then(_ => {
-                        location.href = '/home'
-                    })
+                    }
+
+                    if (avatar === null) {
+                        await myAvatarRef.delete()
+                        newData.hasAvatar = false
+                    } else if (avatar !== profileData.avatar) {
+                        await myAvatarRef.putString(avatar, 'data_url')
+                        newData.hasAvatar = true
+                        newData.avatarUpdated = new Date()
+                    }
+
+                    await firestore.doc('users/' + myUid).update(newData)
+                    location.href = '/home'
                 }
             }
         },
         computed: {
             canSave: function() {
-                return this.name.trim().length > 0 &&
-                    this.name.trim() !== profileData.name.trim()
+                return this.name.trim().length > 0 && (
+                    this.name.trim() !== profileData.name.trim() ||
+                    this.newAvatarData !== null
+                )
             }
         },
         watch: {
             editing: function() {
                 if (!this.editing) {
                     this.name = profileData.name
+                    this.newAvatarData = profileData.avatar
                 }
             }
         }

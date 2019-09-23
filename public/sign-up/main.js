@@ -13,7 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return
         }
         db.collection('users').doc(user.uid).set({
-            avatar: null,
+            avatar: false,
+            avatarUpdated: null,
             dateCreated: new Date(),
             name: signUpForm.nameInput.value
         })

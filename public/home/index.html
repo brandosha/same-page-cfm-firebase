@@ -14,6 +14,7 @@
     <script defer src="/__/firebase/6.3.5/firebase-auth.js"></script>
     <script defer src="/__/firebase/6.3.5/firebase-firestore.js"></script>
     <script defer src="/__/firebase/6.3.5/firebase-functions.js"></script>
+    <script defer src="/__/firebase/6.3.5/firebase-storage.js"></script>
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
     
@@ -28,6 +29,7 @@
     <script src="/sw.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="/resources/avatar.css">
     <link rel="stylesheet" href="/resources/loader.css">
     <link rel="stylesheet" href="/resources/dark.css">
     <link rel="stylesheet" href="style.css">
@@ -79,8 +81,19 @@
                 </div>
               </div>
             </nav>
-            <div v-for="message in firebaseData.groups[groupId].messagesArr" v-if="message !== undefined">
-              {{ firebaseData.users[message.from].name }}: <span v-html="message.html"></span>
+            <div
+              v-for="message in firebaseData.groups[groupId].messagesArr"
+              v-if="message !== undefined"
+              class="d-flex align-items-center py-1"
+            >
+              <img
+                v-if="firebaseData.users[message.from].avatar"
+                class="avatar"
+                :src="firebaseData.users[message.from].avatar"
+                :alt="firebaseData.users[message.from].name"
+              >
+              <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
+              <div v-html="message.html" class="w-100"></div>
             </div>
           </div>
           <div id="message-input">

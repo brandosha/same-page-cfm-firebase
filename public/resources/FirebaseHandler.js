@@ -5,6 +5,7 @@ class FirebaseHandler {
         this.auth = firebase.auth()
         this.firestore = firebase.firestore()
         this.functions = firebase.functions()
+        this.storage = firebase.storage()
         // this.functions.useFunctionsEmulator('http://localhost:5001')
 
         var groups = getLocalObj('groups')
@@ -50,6 +51,9 @@ class FirebaseHandler {
 
         users.forEach(userId => {
             var userData = getLocalObj('user_' + userId)
+            if (userData.avatarUpdated) {
+                userData.avatarUpdated = new Date(userData.avatarUpdated)
+            }
             this.dataObj.users[userId] = userData
         })
     }
@@ -307,20 +311,65 @@ class FirebaseHandler {
     refreshUsers() {
         var userIds = this.getAssociatedUserIds()
         var self = this
-        var promises = userIds.map(userId => {
+
+        var userDataPromises = userIds.map(userId => {
             return this.firestore.doc('users/' + userId).get()
                 .then(snapshot => {
                     var userData = snapshot.data()
-
                     var userObj = {
+                        avatar: null,
+                        avatarUpdated: userData.avatarUpdated,
+                        hasAvatar: userData.hasAvatar,
                         name: userData.name
                     }
+
+                    if (userObj.avatarUpdated) {
+                        userObj.avatarUpdated = userObj.avatarUpdated.toDate()
+                    }
+
+                    async function getAvatar() {
+                        var avatarRef = self.storage.ref().child('avatars').child(userId)
+                        var imgUrl = await avatarRef.getDownloadURL()
+                        self.dataObj.users[userId].avatar = imgUrl
+                        localStorage.setItem('user_' + userId, JSON.stringify(self.dataObj.users[userId]))
+                    }
+
+                    if (self.dataObj.users[userId] !== undefined) {
+                        var localUserObj = self.dataObj.users[userId]
+                        if (userObj.hasAvatar && userObj.avatarUpdated !== localUserObj.avatarUpdated) {
+                            getAvatar()
+                        }
+                        userObj.avatar = userObj.hasAvatar ? localUserObj.avatar : null
+                    }/* else {
+                        userObj.avatar = null
+                    }
+
+                    if (userObj.avatarUpdated !== self.dataObj.users[userId].avatarUpdated)
+
+                    if (userObj.hasAvatar) {
+                        if (userObj.avatarUpdated !== self.dataObj.users[userId].avatarUpdated) {
+                            async function refreshAvatar() {
+                                var avatarRef = self.storage.ref().child('avatars').child(userId)
+                                var imgUrl = await avatarRef.getDownloadURL()
+                                self.dataObj.users[userId].avatar = imgUrl
+                                localStorage.setItem('user_' + userId, JSON.stringify(self.dataObj.users[userId]))
+                            }
+                            refreshAvatar()
+                        } else {
+                            if (self.dataObj.users[userId] && self.dataObj.users[userId].avatar) {
+                                userObj.avatar = self.dataObj.users[userId].avatar
+                            }
+                            
+                        }
+                    } else {
+                        userObj.avatar = null
+                    }*/
                     self.dataObj.users[userId] = userObj
                     localStorage.setItem('user_' + userId, JSON.stringify(userObj))
                 })
         })
 
-        return Promise.all(promises)
+        return Promise.all(userDataPromises)
     }
 
     groupExists(groupId) {
