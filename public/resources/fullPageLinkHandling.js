@@ -12,6 +12,7 @@ function handleFullPageLinks() {
             )
         ) {
             event.preventDefault()
+            loader.show()
             if (navigator.onLine) location.href = newLocation
         }
     })
