@@ -23,11 +23,9 @@ async function handleUI() {
     var profileDoc = await firestore.doc('users/' + myUid).get()
     var profileData = profileDoc.data()
 
-    console.log(profileDoc, profileData)
     if (profileData.hasAvatar) {
         var avatarRef = storage.ref().child('avatars').child(myUid)
         var avatarUrl = await avatarRef.getDownloadURL()
-        console.log(avatarUrl)
     }
 
     var uploadModal = $('#upload-modal')
