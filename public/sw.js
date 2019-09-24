@@ -16,11 +16,11 @@ function registerServiceWorker() {
     });
 }
 
-if('serviceWorker' in navigator) {
-    registerServiceWorker()
-} else if (
+if(
     'ServiceWorkerGlobalScope' in this &&
     this instanceof ServiceWorkerGlobalScope
 ) {
     handleServiceWorker()
+} else {
+    registerServiceWorker()
 }
