@@ -123,7 +123,7 @@ async function handleUI() {
             editing: function() {
                 if (!this.editing) {
                     this.name = profileData.name
-                    this.newAvatarData = profileData.avatar
+                    this.newAvatarData = null
                 }
             }
         }

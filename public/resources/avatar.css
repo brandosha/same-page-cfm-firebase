@@ -19,6 +19,24 @@ div.avatar-lg, img.avatar-lg {
     font-size: 5em;
 }
 
+.avatar-overlay {
+    position: absolute;
+    height: 10em;
+    width: 10em;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.avatar-overlay * {
+    position: absolute;
+    bottom: 0;
+    font-size: 1.5em;
+    line-height: 1.4em;
+    height: 1.8em;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5)
+}
+
 input.avatar-upload {
     width: 1px;
     height: 1px;

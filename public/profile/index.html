@@ -49,14 +49,25 @@
           <div
             v-if="avatar === null && newAvatarData === null"
             class="avatar avatar-lg text-monospace mx-auto"
+            :class="{ 'avatar-edit': editing }"
             onclick="$('#upload').click()"
           >{{ initials() }}</div>
           <img
             v-else
             :src="newAvatarData ? newAvatarData : avatar"
             class="avatar avatar-lg mx-auto"
+            :class="{ 'avatar-edit': editing }"
+          >
+
+          <div
+            v-if="editing"
+            class="avatar-overlay"
             onclick="$('#upload').click()"
           >
+            <div class="w-100">
+              Change
+            </div>
+          </div>
         </div>
         <input
           v-if="editing"
