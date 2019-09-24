@@ -7,6 +7,7 @@ body { transition: background 0.25s; }
     }
 
     .form-control:disabled, .form-control[readonly] { background: #050505; }
+    .form-control-plaintext { color: #bbbbbb; }
     .form-control, .form-control:focus {
         background: #111111;
         color: #aaaaaa;
