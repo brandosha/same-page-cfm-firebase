@@ -340,30 +340,10 @@ class FirebaseHandler {
                             getAvatar()
                         }
                         userObj.avatar = userObj.hasAvatar ? localUserObj.avatar : null
-                    }/* else {
-                        userObj.avatar = null
+                    } else {
+                        getAvatar()
                     }
 
-                    if (userObj.avatarUpdated !== self.dataObj.users[userId].avatarUpdated)
-
-                    if (userObj.hasAvatar) {
-                        if (userObj.avatarUpdated !== self.dataObj.users[userId].avatarUpdated) {
-                            async function refreshAvatar() {
-                                var avatarRef = self.storage.ref().child('avatars').child(userId)
-                                var imgUrl = await avatarRef.getDownloadURL()
-                                self.dataObj.users[userId].avatar = imgUrl
-                                localStorage.setItem('user_' + userId, JSON.stringify(self.dataObj.users[userId]))
-                            }
-                            refreshAvatar()
-                        } else {
-                            if (self.dataObj.users[userId] && self.dataObj.users[userId].avatar) {
-                                userObj.avatar = self.dataObj.users[userId].avatar
-                            }
-                            
-                        }
-                    } else {
-                        userObj.avatar = null
-                    }*/
                     self.dataObj.users[userId] = userObj
                     localStorage.setItem('user_' + userId, JSON.stringify(userObj))
                 })
