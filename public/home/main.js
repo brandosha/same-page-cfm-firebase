@@ -55,15 +55,31 @@ async function handleUI() {
                 if (lastMessage === undefined) return 'No messages'
                 return this.firebaseData.users[lastMessage.from].name.split(' ')[0] + ': ' + lastMessage.text
             },
-            formatDate: function(message) {
-                if (message.sent === undefined) return
+            formatTime: function(message) {
+                if (!(message.sent && message.sent.toLocaleString)) return
                 return message.sent.toLocaleString(undefined, {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
                     hour: 'numeric',
                     minute: 'numeric'
+                }).replace(' ', '&nbsp;')
+            },
+            shouldAddDate: function(index) {
+                var thisMessage = this.firebaseData.groups[this.groupId].messagesArr[index]
+                var nextMessage = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
+                if (thisMessage && thisMessage.sent && nextMessage && nextMessage.sent) {
+                    var secondsBetween = nextMessage.sent.getTime() - thisMessage.sent.getTime()
+                    return secondsBetween > 30 * 60 * 1000
+                }
+                return false
+            },
+            formatDate: function(index) {
+                var message = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
+                if (!(message.sent && message.sent.toLocaleString)) return
+                var date = message.sent.toLocaleString(undefined, {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
                 })
+                return '<strong>' + date + '</strong> '
             },
             initials: function(message) {
                 var name = this.firebaseData.users[message.from].name

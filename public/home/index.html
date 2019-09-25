@@ -82,28 +82,29 @@
               </div>
             </nav>
             <div
-              v-for="message in firebaseData.groups[groupId].messagesArr"
+              v-for="(message, index) in firebaseData.groups[groupId].messagesArr"
               v-if="message !== undefined"
-              class="py-1 d-flex align-items-center justify-content-between"
+              class="py-1 "
             >
-              <div
-                class="d-flex align-items-center message-container"
-              >
-                <img
-                  v-if="firebaseData.users[message.from].avatar"
-                  class="avatar"
-                  :src="firebaseData.users[message.from].avatar"
-                  :alt="firebaseData.users[message.from].name"
-                >
-                <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
-  
-                <div
-                  v-html="message.html"
-                  class="message"
-                  :class="message.from === firebaseData.uid ? 'message-from-me' : 'message-from-other'"
-                ></div>
+              <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center message-container">
+                  <img
+                    v-if="firebaseData.users[message.from].avatar"
+                    class="avatar"
+                    :src="firebaseData.users[message.from].avatar"
+                    :alt="firebaseData.users[message.from].name"
+                  >
+                  <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
+    
+                  <div
+                    v-html="message.html"
+                    class="message"
+                    :class="message.from === firebaseData.uid ? 'message-from-me' : 'message-from-other'"
+                  ></div>
+                </div>
+                <div class="timestamp text-monospace" v-html="formatTime(message)"></div>
               </div>
-              <div class="timestamp text-monospace">{{ formatDate(message) }}</div>
+              <div v-if="shouldAddDate(index)" class="date" v-html="formatDate(index)"></div>
             </div>
           </div>
           <div id="message-input">
