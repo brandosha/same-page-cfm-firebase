@@ -55,6 +55,16 @@ async function handleUI() {
                 if (lastMessage === undefined) return 'No messages'
                 return this.firebaseData.users[lastMessage.from].name.split(' ')[0] + ': ' + lastMessage.text
             },
+            formatDate: function(message) {
+                if (message.sent === undefined) return
+                return message.sent.toLocaleString(undefined, {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric'
+                })
+            },
             initials: function(message) {
                 var name = this.firebaseData.users[message.from].name
                 var names = name.split(' ')

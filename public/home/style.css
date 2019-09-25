@@ -33,10 +33,23 @@ body {
 
 #messages {
     padding-top: 4em;
-    /* height: calc(100vh - 65px); */
     padding-bottom: 5em;
     overflow: scroll;
     word-wrap: break-word;
+}
+
+.message-container { max-width: 75%; }
+.message {
+    border-radius: 10px;
+    padding: 10px;
+}
+.message-from-me { border: solid 2px #777777; }
+.message-from-other { background: #222222; }
+
+.timestamp {
+    text-align: right;
+    font-size: 0.75em;
+    padding-left: 10px;
 }
 
 #message-input {

@@ -84,16 +84,26 @@
             <div
               v-for="message in firebaseData.groups[groupId].messagesArr"
               v-if="message !== undefined"
-              class="d-flex align-items-center py-1"
+              class="py-1 d-flex align-items-center justify-content-between"
             >
-              <img
-                v-if="firebaseData.users[message.from].avatar"
-                class="avatar"
-                :src="firebaseData.users[message.from].avatar"
-                :alt="firebaseData.users[message.from].name"
+              <div
+                class="d-flex align-items-center message-container"
               >
-              <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
-              <div v-html="message.html" class="w-100"></div>
+                <img
+                  v-if="firebaseData.users[message.from].avatar"
+                  class="avatar"
+                  :src="firebaseData.users[message.from].avatar"
+                  :alt="firebaseData.users[message.from].name"
+                >
+                <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
+  
+                <div
+                  v-html="message.html"
+                  class="message"
+                  :class="message.from === firebaseData.uid ? 'message-from-me' : 'message-from-other'"
+                ></div>
+              </div>
+              <div class="timestamp text-monospace">{{ formatDate(message) }}</div>
             </div>
           </div>
           <div id="message-input">
