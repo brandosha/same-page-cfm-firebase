@@ -143,28 +143,7 @@ class FirebaseHandler {
             .onSnapshot(querySnapshot => {
                 querySnapshot.docChanges().forEach(change => {
                     var snapshot = change.doc
-                    /*console.log(change)
-                    if (change.type === 'removed') {
-                        var deletedMessage = this.dataObj.groups[groupId].messagesObj[snapshot.id]
-
-                        var messageRemoved = false
-                        this.dataObj.groups[groupId].messagesArr = 
-                        this.dataObj.groups[groupId].messagesArr.filter(value => {
-                            if (messageRemoved) return true
-
-                            if (
-                                value.from == deletedMessage.from &&
-                                value.text == deletedMessage.text &&
-                                value.sent.getTime() == deletedMessage.sent.getTime()
-                            ) {
-                                messageRemoved = true
-                                return false
-                            }
-                            return true
-                        })
-
-                        this.dataObj.groups[groupId].messagesObj[snapshot.id] = undefined
-                    } else*/ if (!(snapshot.id in this.dataObj.groups[groupId].messagesObj)) {
+                    if (!(snapshot.id in this.dataObj.groups[groupId].messagesObj)) {
                         var messageData = snapshot.data()
                         if (messageData.sent === null) return
 
@@ -540,14 +519,12 @@ class FirebaseHandler {
             throw new Error('No group with id ' + groupId)
         }
 
-        var event = await this.firestore.collection('groups/' + groupId + '/events').add({
+        await this.firestore.collection('groups/' + groupId + '/events').add({
             id: messageId,
             time: firebase.firestore.FieldValue.serverTimestamp(),
             type: 'delete-message'
         })
-        console.log(event)
-        var deletion = await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).delete()
-        console.log(deletion)
+        await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).delete()
     }
 }
 
