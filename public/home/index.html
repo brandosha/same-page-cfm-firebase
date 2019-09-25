@@ -28,7 +28,7 @@
     <script src="/resources/fullPageLinkHandling.js"></script>
     <script src="/sw.js"></script>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="/resources/avatar.css">
     <link rel="stylesheet" href="/resources/loader.css">
     <link rel="stylesheet" href="/resources/dark.css">
@@ -37,6 +37,74 @@
   <body>
     <div id="vue-main" class="container-fluid p-0 window-height">
       <div class="row" v-if='!noGroups'>
+        <nav class="fixed-top container-fluid">
+          <div class="row">
+            <div
+              id="group-toolbar"
+              class="d-sm-flex p-1 align-items-center justify-content-between col-sm-4"
+              :class="isValidGroup ? 'd-none' : 'd-flex'"
+            >
+              <div>
+                <span class="invisible nav-link h5 m-0" href="#">
+                  &#9664;
+                </span>
+              </div>
+              <div class="text-dark h5 m-0 text-capitalize">
+                  Groups
+              </div>
+              <div class="dropdown">
+                <a
+                  class="nav-link text-dark h4 m-0"
+                  data-toggle="dropdown"
+                  href="#"
+                  @click.prevent
+                >&#8943;</a>
+                <div class="dropdown-menu">
+                  <a
+                    class="dropdown-item"
+                    :class="disabledIfOffline"
+                    href="/create-group"
+                  >Create group</a>
+                  <a
+                    class="dropdown-item"
+                    :class="disabledIfOffline"
+                    href="/profile"
+                  >Profile</a>
+                </div>
+              </div>
+            </div>
+            <div
+              v-if="isValidGroup"
+              id="group-toolbar"
+              class="d-flex p-1 align-items-center justify-content-between col-sm-8"
+            >
+              <div>
+                <a
+                  class="nav-link text-dark h5 m-0 d-xs-block d-sm-none" 
+                  href="#"
+                >&#9664;</a>
+              </div>
+              <div class="text-dark h5 m-0 d-xs-block d-sm-none text-capitalize">
+                {{ firebaseData.groups[groupId].name }}
+              </div>
+              <div class="dropdown">
+                <a
+                  class="nav-link text-dark h4 m-0"
+                  data-toggle="dropdown"
+                  href="#"
+                  @click.prevent
+                >&#8943;</a>
+                <div class="dropdown-menu">
+                  <a
+                    class="dropdown-item"
+                    :class="disabledIfOffline"
+                    :href="'/group-settings/#'+groupId"
+                  >Group settings</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </nav>
         <div id="group-list" class="col-sm-4 pr-0 border-right border-dark window-height" :class="{ 'd-none d-sm-block': isValidGroup }">
           <transition-group name="group-list" tag="div">
           <div v-for="group in firebaseData.groupArr" :key="group.id" class="group-list-item">
@@ -51,36 +119,6 @@
         </div>
         <div class="col-sm-8" v-if="isValidGroup">
           <div id="messages" class="container window-height">
-            <nav id="group-toolbar" class="d-flex p-1 align-items-center justify-content-between">
-              <div>
-                <a class="nav-link text-dark h5 m-0 d-xs-block d-sm-none" href="#">
-                  &#9664;
-                </a>
-              </div>
-              <div class="text-dark h5 m-0 d-xs-block d-sm-none text-capitalize">
-                {{ firebaseData.groups[groupId].name }}
-              </div>
-              <div class="dropdown">
-                <a class="nav-link text-dark h4 m-0" data-toggle="dropdown" href="#" @click.prevent>&#8943;</a>
-                <div class="dropdown-menu">
-                  <a
-                    class="dropdown-item"
-                    :class="disabledIfOffline"
-                    :href="'/group-settings/#'+groupId"
-                  >Group settings</a>
-                  <a
-                    class="dropdown-item"
-                    :class="disabledIfOffline"
-                    href="/create-group"
-                  >Create group</a>
-                  <a
-                    class="dropdown-item"
-                    :class="disabledIfOffline"
-                    href="/profile"
-                  >Profile</a>
-                </div>
-              </div>
-            </nav>
             <div
               v-for="(message, index) in firebaseData.groups[groupId].messagesArr"
               v-if="message !== undefined"
@@ -109,7 +147,7 @@
                     class="dropdown d-inline-block"
                   >
                     <a
-                      class="message-options text-dark nav-link pl-1 py-0"
+                      class="message-options text-dark nav-link p-0"
                       data-toggle="dropdown"
                       href="#"
                       @click.prevent
@@ -129,23 +167,31 @@
               <div v-if="shouldAddDate(index)" class="date" v-html="formatDate(index)"></div>
             </div>
           </div>
-          <div id="message-input">
-            <form @submit.prevent="sendMessage" class="container-fluid">
-              <div class="row form-group">
-                <input
-                  type="text"
-                  v-model="newMessage"
-                  class="form-control mx-3 col"
-                  :disabled="sendFormDisabled.input"
-                >
-                <input 
-                  type="submit" 
-                  value="Send" 
-                  class="btn btn-primary mx-2 col-auto"
-                  :disabled="sendFormDisabled.submit"
-                >
+          <div class="container-fluid fixed-bottom">
+            <div class="row">
+              <div class="col-sm-4 invisible"></div>
+              <div id="message-input" class="col-sm-8">
+                <form @submit.prevent="sendMessage">
+                  <div
+                    class="row form-group mx-0"
+                    :class="fullPage ? 'mb-4' : 'mb-1'"
+                  >
+                    <input
+                      type="text"
+                      v-model="newMessage"
+                      class="form-control mx-3 col"
+                      :disabled="sendFormDisabled.input"
+                    >
+                    <input 
+                      type="submit" 
+                      value="Send" 
+                      class="btn btn-primary mx-2 col-auto"
+                      :disabled="sendFormDisabled.submit"
+                    >
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
         </div>
         <div class="col-sm-8 d-none d-sm-block" v-else>

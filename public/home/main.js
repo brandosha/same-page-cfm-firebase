@@ -16,17 +16,6 @@ var mainUI
 
 async function handleUI() {
     firebaseHandler = new FirebaseHandler(firebase)
-
-    $(window).on('hashchange', event => {
-        var newHash = window.location.hash.slice(1)
-        mainUI.groupId = newHash
-        mainUI.$nextTick(_ => {
-            handleFullPageLinks()
-            if (!mainUI.isValidGroup) return
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
-        })
-    })
-
     await firebaseHandler.refreshAndConnectAll()
 
     mainUI = new Vue({
@@ -34,6 +23,7 @@ async function handleUI() {
         data: {
             firebaseData: firebaseHandler.dataObj,
             groupId: window.location.hash.slice(1),
+            fullPage: fullPage,
             newMessage: ''
         },
         methods: {
@@ -126,6 +116,16 @@ async function handleUI() {
                 loader.hide()
             })
         }
+    })
+
+    $(window).on('hashchange', event => {
+        var newHash = window.location.hash.slice(1)
+        mainUI.groupId = newHash
+        mainUI.$nextTick(_ => {
+            handleFullPageLinks()
+            if (!mainUI.isValidGroup) return
+            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+        })
     })
 }
 

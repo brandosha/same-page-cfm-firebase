@@ -8,6 +8,7 @@ body { overflow: hidden; }
 #group-list {
     overflow: scroll;
     height: 100vh;
+    padding-top: 3.25em;
 }
 
 .group-btn {
@@ -19,10 +20,6 @@ body { overflow: hidden; }
 .group-list-item { transition: all 1s; }
 
 #group-toolbar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 100%;
     background: #f0f0f0;
     transition: background 0.25s;
     z-index: 1;
@@ -62,23 +59,9 @@ body { overflow: hidden; }
 
 #message-input {
     padding: 5px 0;
-    margin-bottom: 0;
     box-shadow: 0 -12px 10px -15px darkgray;
     background: white;
     transition: background 0.25s;
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-}
-
-@media (min-width: 576px) {
-    #group-toolbar {
-        width: calc(66.66% + 5px);
-    }
-    #message-input {
-        width: 66.66%;
-    }
 }
 
 #group-ui-body {
