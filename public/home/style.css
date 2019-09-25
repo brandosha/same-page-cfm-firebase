@@ -44,7 +44,10 @@ body { overflow: hidden; }
     padding: 10px;
 }
 .message-from-me { border: solid 2px #777777; }
-.message-from-other { background: #222222; }
+.message-from-other {
+    transition: background 0.25s;
+    background: #bbbbbb;
+}
 
 .timestamp {
     text-align: right;
@@ -116,6 +119,8 @@ body { overflow: hidden; }
     }
 
     #group-toolbar { background: #111111; }
+
+    .message-from-other { background: #222222; }
 }
 
 @supports ((-webkit-backdrop-filter: blur(30px)) or (backdrop-filter: blur(30px))) {
