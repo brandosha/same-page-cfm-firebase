@@ -93,6 +93,7 @@ class FirebaseHandler {
             var messageObj = messagesObj[messageId]
 
             messagesArr.push({
+                id: messageId,
                 from: messageObj.from,
                 sent: messageObj.sent,
                 text: messageObj.text,
@@ -142,6 +143,7 @@ class FirebaseHandler {
             .onSnapshot(querySnapshot => {
                 querySnapshot.docChanges().forEach(change => {
                     var snapshot = change.doc
+                    /*console.log(change)
                     if (change.type === 'removed') {
                         var deletedMessage = this.dataObj.groups[groupId].messagesObj[snapshot.id]
 
@@ -162,7 +164,7 @@ class FirebaseHandler {
                         })
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = undefined
-                    } else if (!(snapshot.id in this.dataObj.groups[groupId].messagesObj)) {
+                    } else*/ if (!(snapshot.id in this.dataObj.groups[groupId].messagesObj)) {
                         var messageData = snapshot.data()
                         if (messageData.sent === null) return
 
@@ -174,6 +176,7 @@ class FirebaseHandler {
                         }
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = messageObj
+                        messageObj.id = snapshot.id
                         this.dataObj.groups[groupId].messagesArr.push(messageObj)
 
                         this.newMessageInGroup(groupId)
@@ -183,6 +186,51 @@ class FirebaseHandler {
                 localStorage.setItem(groupId + '_messages', JSON.stringify(this.dataObj.groups[groupId].messagesObj))
             })
             this.listenerUnsubscribers.push(unsubscriber)
+
+            this.listenerUnsubscribers.push(
+                this.firestore.collection('groups/' + groupId + '/events').where('time', '>', new Date())
+                .onSnapshot(querySnapshot => {
+                    querySnapshot.docChanges().forEach(change => {
+                        var snapshot = change.doc
+                        var event = snapshot.data()
+                        if (change.type === 'added') {
+                            if (event.type === 'delete-message') {
+                                var messageId = event.id
+                                var deletedMessage = this.dataObj.groups[groupId].messagesObj[messageId]
+
+                                var messageRemoved = false
+                                this.dataObj.groups[groupId].messagesArr = 
+                                this.dataObj.groups[groupId].messagesArr.filter(value => {
+                                    if (messageRemoved) return true
+
+                                    if (
+                                        value.from == deletedMessage.from &&
+                                        value.text == deletedMessage.text &&
+                                        value.sent.getTime() == deletedMessage.sent.getTime()
+                                    ) {
+                                        messageRemoved = true
+                                        return false
+                                    }
+                                    return true
+                                })
+
+                                this.dataObj.groups[groupId].messagesObj[messageId] = undefined
+                            } else {
+                                console.log(event)
+                            }
+
+                            switch (event.type) {
+                                case 'delete-message':
+                                    
+                                    break;
+                                default:
+                                    
+                                    break;
+                            }
+                        }
+                    })
+                })
+            )
         })
         this.createGroupArray()
         await this.refreshUsers()
@@ -481,8 +529,25 @@ class FirebaseHandler {
         messageObj.sent = now
         this.dataObj.groups[groupId].messagesObj[newDoc.id] = messageObj
         this.dataObj.groups[groupId].messagesArr[arrIndex].sent = now
+        this.dataObj.groups[groupId].messagesArr[arrIndex].id = newDoc.id
 
         this.newMessageInGroup(groupId)
+    }
+
+    async deleteMessage(groupId, messageId) {
+        if (this.dataObj.offline) return
+        if (!this.groupExists(groupId)) {
+            throw new Error('No group with id ' + groupId)
+        }
+
+        var event = await this.firestore.collection('groups/' + groupId + '/events').add({
+            id: messageId,
+            time: firebase.firestore.FieldValue.serverTimestamp(),
+            type: 'delete-message'
+        })
+        console.log(event)
+        var deletion = await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).delete()
+        console.log(deletion)
     }
 }
 

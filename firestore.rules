@@ -24,6 +24,18 @@ service cloud.firestore {
         !isEmptyString(request.resource.data.text) 
     }
     
+    function isValidEvent(groupId) {
+    	return (
+      	(
+        	request.resource.data.type == 'delete-message' &&
+          request.resource.data.id is string &&
+          get(/databases/$(database)/documents/groups/$(groupId)/messages/$(request.resource.data.id)).data.from == request.auth.uid
+        ) || (
+        	false
+        )
+      )
+    }
+    
   	match /groups/{groupId} {
       allow read: if isMemberOfGroup(groupId)
       allow update: if isManagerOfGroup(groupId)
@@ -33,6 +45,14 @@ service cloud.firestore {
       allow read: if isMemberOfGroup(groupId)
       allow delete: if resource.data.from == request.auth.uid || isManagerOfGroup(groupId)
       allow create: if isMemberOfGroup(groupId) && isValidMessage()
+    }
+    
+    match /groups/{groupId}/events/{messageId} {
+      allow read: if isMemberOfGroup(groupId)
+      allow create: if isMemberOfGroup(groupId) && (
+      	isManagerOfGroup(groupId) ||
+        isValidEvent(groupId)
+      )
     }
     
     match /groups/{groupId}/members/{userId} {

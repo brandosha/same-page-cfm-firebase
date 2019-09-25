@@ -86,7 +86,7 @@
               v-if="message !== undefined"
               class="py-1 "
             >
-              <div class="d-flex align-items-center justify-content-between">
+              <div class="d-flex align-items-center justify-content-between message-row">
                 <div class="d-flex align-items-center message-container">
                   <img
                     v-if="firebaseData.users[message.from].avatar"
@@ -102,7 +102,29 @@
                     :class="message.from === firebaseData.uid ? 'message-from-me' : 'message-from-other'"
                   ></div>
                 </div>
-                <div class="timestamp text-monospace" v-html="formatTime(message)"></div>
+                <div class="text-center">
+                  <span class="timestamp text-monospace" v-html="formatTime(message)"></span>
+                  <span
+                    v-if="message.from === firebaseData.uid || firebaseData.groups[groupId].members[firebaseData.uid].isManager"
+                    class="dropdown d-inline-block"
+                  >
+                    <a
+                      class="message-options text-dark nav-link pl-1 py-0"
+                      data-toggle="dropdown"
+                      href="#"
+                      @click.prevent
+                    >
+                      &nbsp;&#8943;
+                    </a>
+                    <div class="dropdown-menu">
+                      <a
+                        class="dropdown-item text-danger"
+                        href="#"
+                        @click.prevent="deleteMessage(message)"
+                      >Delete</a>
+                    </div>
+                  </span>
+                </div>
               </div>
               <div v-if="shouldAddDate(index)" class="date" v-html="formatDate(index)"></div>
             </div>

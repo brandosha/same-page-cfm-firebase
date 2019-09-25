@@ -1,6 +1,4 @@
-body {
-    overflow: hidden;
-}
+body { overflow: hidden; }
 
 #vue-main {
     overflow: hidden;
@@ -18,9 +16,7 @@ body {
     border-radius: 0;
 }
 
-.group-list-item {
-    transition: all 1s;
-}
+.group-list-item { transition: all 1s; }
 
 #group-toolbar {
     position: fixed;
@@ -29,6 +25,7 @@ body {
     width: 100%;
     background: #f0f0f0;
     transition: background 0.25s;
+    z-index: 1;
 }
 
 #messages {
@@ -39,6 +36,9 @@ body {
 }
 
 .message-container { max-width: 75%; }
+.message-row div .dropdown .message-options { display: none; }
+.message-row:hover div .dropdown .message-options { display: inline; }
+
 .message {
     border-radius: 10px;
     padding: 10px;

@@ -48,6 +48,11 @@ async function handleUI() {
                     });
                 })
             },
+            deleteMessage: function(message) {
+                console.log('Deleting message with id:', message.id)
+                var messageId = message.id
+                firebaseHandler.deleteMessage(this.groupId, messageId)
+            },
             selectGroup: function(groupId) {
                 window.location.hash = groupId
             },
