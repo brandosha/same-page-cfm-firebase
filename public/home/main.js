@@ -74,11 +74,14 @@ async function handleUI() {
             formatDate: function(index) {
                 var message = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
                 if (!(message.sent && message.sent.toLocaleString)) return
-                var date = message.sent.toLocaleString(undefined, {
+                var dateSettings = {
                     weekday: 'long',
                     month: 'long',
-                    day: 'numeric',
-                })
+                    day: 'numeric'
+                }
+                if (message.sent.getYear() !== new Date().getYear()) dateSettings.year = 'numeric'
+
+                var date = message.sent.toLocaleString(undefined, dateSettings)
                 return '<strong>' + date + '</strong> '
             },
             initials: function(message) {
