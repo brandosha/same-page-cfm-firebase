@@ -197,15 +197,6 @@ class FirebaseHandler {
                             } else {
                                 console.log(event)
                             }
-
-                            switch (event.type) {
-                                case 'delete-message':
-                                    
-                                    break;
-                                default:
-                                    
-                                    break;
-                            }
                         }
                     })
                 })
