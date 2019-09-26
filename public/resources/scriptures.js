@@ -48,7 +48,7 @@ function parseMessageForScriptureRef(message) {
     scriptures.forEach(scripture => {
         scripture.names.forEach(scriptureName => {
             var nameLength = scriptureName.length
-            var startIndices = indicesOf(htmlStr.toLowerCase(),scriptureName)
+            var startIndices = indicesOf(htmlStr.toLowerCase(),RegExp('\\b'+scriptureName+' '))
             var addedChars = 0
             startIndices.forEach(startInd => {
                 var startInd = startInd + addedChars
@@ -84,7 +84,7 @@ function parseMessageForScriptureRef(message) {
                     href += '.' + versesRef + '#' + verses[0]
                 }
 
-                var endInd = startInd+nameLength+1+ref.length+trailingChars
+                var endInd = startInd + nameLength + 1 + ref.length + trailingChars
                 htmlStr = insert(
                     htmlStr,
                     '</a>' ,
@@ -110,11 +110,11 @@ function insert(str,insertion,index) {
 function indicesOf(str,search) {
     var indices = []
     var resStr = str
-    var newIndex
+    var newMatch
     var actualIndex = 0
-    while ((newIndex = resStr.indexOf(search)) !== -1) {
-        var afterOccurence = newIndex + search.length
-        indices.push(actualIndex + newIndex)
+    while ((newMatch = resStr.match(search)) !== null) {
+        var afterOccurence = newMatch.index + newMatch[0].length
+        indices.push(actualIndex + newMatch.index)
         resStr = resStr.substr(afterOccurence)
         actualIndex += afterOccurence
     }
@@ -535,7 +535,7 @@ var scriptures = [
     },
     // Doctrine and Covenants
     {
-        names: ['doctrine and covenants', 'd & c', 'd&c'],
+        names: ['doctrine and covenants', 'd & c', 'd&c', 'd and c', 'dc'],
         chapters: 138,
         path: '/dc-testament/dc/',
         verses: [39,3,20,7,35,37,8,12,14,70,30,9,1,11,6,6,9,47,41,84,12,4,7,19,16,2,18,16,50,11,13,5,18,12,27,8,4,42,24,3,12,93,35,6,75,33,4,6,28,46,20,44,7,10,6,20,16,65,24,17,39,9,66,43,6,13,14,35,8,18,11,26,6,7,36,119,15,22,4,5,7,24,6,120,12,11,8,141,21,37,6,2,53,17,17,9,28,48,8,17,101,34,40,86,41,8,100,8,80,16,11,34,10,2,19,1,16,6,7,1,46,9,17,145,4,3,12,25,9,23,8,66,74,12,7,42,10,60]
