@@ -8,7 +8,7 @@ function handleFullPageLinks() {
             newLocation.substr(0, 1) !== '#' && 
             (
                 newLocation.substr(0, 1) === '/' ||
-                newLocation.contains(location.hostname)
+                newLocation.includes(location.hostname)
             )
         ) {
             event.preventDefault()
