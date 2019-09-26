@@ -1,5 +1,5 @@
 /* Page crawling script. Open table of contents and maximize everything before running
-console.log(JSON.stringify([...document.getElementsByClassName('subItems-2yUxK')[0].children].map(el => { var href,children = [...el.children]; if (children.length < 2) { console.log(el); href = children[0].href; return { names: [children[0].textContent.trim().toLowerCase()],chapters: 1,path: href.substr(52,href.length-53)} }; href = children[1].children[0].children[0].href; href = href.substr(52,href.length-53); return { names: [children[0].textContent.trim().toLowerCase()],chapters: children[1].children.length,path: href} } )))
+console.log(JSON.stringify([...document.getElementsByClassName("subItems-2yUxK")[0].children].map(el=>{var children=[...el.children],chapters=1,href=children[0].href;if(children.length>1){href=children[1].children[0].children[0].href;chapters=children[1].children.length}href=href.substr(52,href.length-53);return{names:[children[0].textContent.trim().toLowerCase()],chapters:chapters,path:href}})))
 */
 
 /* Phantomjs script. Set scriptureData variable to result from page crawling script removing title pages
