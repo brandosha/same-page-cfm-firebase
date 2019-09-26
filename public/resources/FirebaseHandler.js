@@ -97,7 +97,7 @@ class FirebaseHandler {
                 from: messageObj.from,
                 sent: messageObj.sent,
                 text: messageObj.text,
-                html: this.parseMessageForScriptureRef(messageObj.text)
+                html: parseMessageForScriptureRef(messageObj.text)
             })
         }
 
@@ -150,7 +150,7 @@ class FirebaseHandler {
                         var messageObj = {
                             from: messageData.from,
                             text: messageData.text,
-                            html: this.parseMessageForScriptureRef(messageData.text),
+                            html: parseMessageForScriptureRef(messageData.text),
                             sent: messageData.sent.toDate()
                         }
 
@@ -374,64 +374,6 @@ class FirebaseHandler {
         return groupId in this.dataObj.groups
     }
 
-    parseMessageForScriptureRef(message) {
-        var htmlStr = message
-        htmlStr = htmlStr.replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        scriptures.forEach(scripture => {
-            var nameLength = scripture.name.length
-            var startIndices = indicesOf(htmlStr.toLowerCase(), scripture.name)
-            var addedChars = 0
-            startIndices.forEach(startInd => {
-                var startInd = startInd + addedChars
-                var ref = htmlStr.slice(startInd+nameLength+1).split(/[^,0-9:-]/)[0]
-                var splitRef = ref.split(':')
-                var chapter = splitRef[0]
-                var chapterInt = parseInt(chapter)
-                var versesRef = splitRef[1]
-                var verseInt = parseInt(versesRef)
-
-                if (
-                    isNaN(chapterInt) || 
-                    chapterInt.toString() !== chapter ||
-                    chapterInt < 1 ||
-                    chapterInt > scripture.chapters
-                ) return
-
-                var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
-                var trailingComma = 0
-                if (/[,0-9:-]/.test(versesRef)) {
-                    var verses = versesRef.split(/[,:-]/)
-                    var validVerses = verses.reduce((prev, verse, index) => {
-                        var verse = parseInt(verse)
-                        var lastVerse = index === verses.length - 1
-                        if (lastVerse && versesRef[versesRef.length - 1] === ',') {
-                            trailingComma = -1
-                            return prev
-                        }
-                        return prev && !isNaN(verse) && verse > 0 && verse <= scripture.verses[chapterInt-1]
-                    }, true)
-                    if (!validVerses) return
-                    href += '.' + versesRef + '#' + verses[0]
-                }
-
-                var endInd = startInd+nameLength+1+ref.length+trailingComma
-                htmlStr = insert(
-                    htmlStr,
-                    '</a>',
-                    endInd
-                )
-                htmlStr = insert(
-                    htmlStr,
-                    '<a href="' + href + '" target="_blank">',
-                    startInd
-                )
-
-                addedChars += href.length + 31
-            })
-        })
-        return htmlStr
-    }
-
     async refreshMessages(groupId) {
         if (this.dataObj.offline) return
         if (!this.groupExists(groupId)) {
@@ -459,7 +401,7 @@ class FirebaseHandler {
                     messages[messageId] = {
                         from: messageData.from,
                         text: messageData.text,
-                        html: this.parseMessageForScriptureRef(messageData.text),
+                        html: parseMessageForScriptureRef(messageData.text),
                         sent: messageData.sent.toDate()
                     }
                 })
@@ -490,7 +432,7 @@ class FirebaseHandler {
         this.dataObj.groups[groupId].messagesArr.push({
             from: this.dataObj.uid,
             text: text,
-            html: this.parseMessageForScriptureRef(text)
+            html: parseMessageForScriptureRef(text)
         })
 
         var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
@@ -517,24 +459,6 @@ class FirebaseHandler {
         })
         await this.firestore.doc('groups/' + groupId + '/messages/' + messageId).delete()
     }
-}
-
-function insert(str, insertion, index) {
-    return str.substr(0, index) + insertion + str.substr(index)
-}
-
-function indicesOf(str, search) {
-    var indices = []
-    var resStr = str
-    var newIndex
-    var actualIndex = 0
-    while ((newIndex = resStr.indexOf(search)) !== -1) {
-        var afterOccurence = newIndex + search.length
-        indices.push(actualIndex + newIndex)
-        resStr = resStr.substr(afterOccurence)
-        actualIndex += afterOccurence
-    }
-    return indices.sort((a,b) => a-b)
 }
 
 async function asyncForEach(array, callback) {
