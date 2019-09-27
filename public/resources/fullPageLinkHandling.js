@@ -4,12 +4,9 @@ function handleFullPageLinks() {
     $('a').click(event => {
         var newLocation = $(event.target).attr('href')
         if (
-            newLocation !== undefined && 
-            newLocation.substr(0, 1) !== '#' && 
-            (
-                newLocation.substr(0, 1) === '/' ||
-                newLocation.includes(location.hostname)
-            )
+            newLocation !== undefined &&
+            newLocation.substr(0, 1) !== '#' &&
+            newLocation.substr(0,1) === '/'
         ) {
             event.preventDefault()
             loader.show()
