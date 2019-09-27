@@ -45,10 +45,23 @@ getChapterLengths(0)
 function parseMessageForScriptureRef(message) {
     var htmlStr = message
     htmlStr = htmlStr.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    
+    var refs = []
     scriptures.forEach(scripture => {
         scripture.names.forEach(scriptureName => {
-            var nameLength = scriptureName.length
-            var startIndices = indicesOf(htmlStr.toLowerCase(),RegExp('\\b'+scriptureName+' '))
+            // var nameLength = scriptureName.length
+
+            var refMatcher = new RegExp('\\b'+scriptureName+' [0-9]{1,3}(:[0-9][0-9,-]*)?', 'g')
+            var match;
+            while (match = refMatcher.exec(htmlStr.toLowerCase())) {
+                refs.unshift({
+                    match: match,
+                    scripture: scripture,
+                    name: scriptureName
+                })
+            }
+            
+            /*var startIndices = indicesOf(htmlStr.toLowerCase(),RegExp('\\b'+scriptureName+' \\d'))
             var addedChars = 0
             startIndices.forEach(startInd => {
                 var startInd = startInd + addedChars
@@ -97,9 +110,65 @@ function parseMessageForScriptureRef(message) {
                 )
 
                 addedChars += href.length + 31
-            })
+            })*/
         })
     })
+
+    refs = refs.sort((a,b) => b.match.index - a.match.index)
+    if (refs.length > 0) console.log(htmlStr, refs)
+    refs.forEach((ref, i) => {
+        var match = ref.match
+        var matchStr = match[0]
+        if (refs[i-1] !== undefined) {
+            var endIndex = match.index + matchStr.length
+            if (endIndex > refs[i-1].match.index) {
+                var overflow = endIndex - refs[i-1].match.index
+                matchStr = matchStr.substr(0, matchStr.length - overflow)
+            }
+        }
+
+        var numRef = matchStr.substr(ref.name.length + 1)
+        var [chapter, verses] = numRef.split(':')
+
+        var chapterInt = parseInt(chapter)
+        if (
+            isNaN(chapterInt) ||
+            chapterInt.toString() !== chapter ||
+            chapterInt < 1 ||
+            chapterInt > ref.scripture.chapters
+        ) return
+
+        var href = 'https://churchofjesuschrist.org/study/scriptures' + ref.scripture.path + chapterInt
+        var refLength = matchStr.length
+        if (verses === '') refLength -= 1
+
+        if (verses !== undefined && verses !== '') {
+            var versesRefLength = verses.length
+            
+            var verseNums = verses.split(/[-,]/)
+            var validVerses = verseNums.reduce((valid, verseStr) => {
+                if (verseStr === '') {
+                    versesRefLength -= 1
+                    return valid
+                }
+                var verse = parseInt(verseStr)
+                return valid && verse > 0 && verse <= ref.scripture.verses[chapterInt - 1]
+            }, true)
+            
+            if (validVerses) {
+                href += '.' + verses.substr(0, versesRefLength) + '#' + verseNums[0]
+                refLength -= (verses.length - versesRefLength)
+            } else {
+                refLength -= verses.length + 1
+            }
+        }
+        
+        htmlStr = insert(htmlStr, '</a>', match.index + refLength)
+        htmlStr = insert(htmlStr, '<a href="' + href + '" target="_blank">', match.index)
+
+        console.log(matchStr, match.index, numRef, chapter, verses)
+    })
+
     return htmlStr
 }
 
@@ -542,12 +611,12 @@ var scriptures = [{
 	path: "/pgp/abr/",
 	verses: [31, 25, 28, 31, 21]
 }, {
-	names: ["joseph smith—matthew", "joseph smith-matthew", "js—m", "js—m.", "js-m", "js-m."],
+	names: ["joseph smith—matthew", "joseph smith-matthew", "joseph smith matthew", "js—m", "js—m.", "js-m", "js-m.", "jsm", "jsm."],
 	chapters: 1,
 	path: "/pgp/js-m/",
 	verses: [55]
 }, {
-	names: ["joseph smith—history", "joseph smith-history", "js—h", "js—h.", "js-h", "js-h."],
+	names: ["joseph smith—history", "joseph smith-history", "joseph smith history", "js—h", "js—h.", "js-h", "js-h.", "jsh", "jsh."],
 	chapters: 1,
 	path: "/pgp/js-h/",
 	verses: [75]
