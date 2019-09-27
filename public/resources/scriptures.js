@@ -49,8 +49,6 @@ function parseMessageForScriptureRef(message) {
     var refs = []
     scriptures.forEach(scripture => {
         scripture.names.forEach(scriptureName => {
-            // var nameLength = scriptureName.length
-
             var refMatcher = new RegExp('\\b'+scriptureName+' [0-9]{1,3}(:[0-9][0-9,-]*)?', 'g')
             var match;
             while (match = refMatcher.exec(htmlStr.toLowerCase())) {
@@ -60,62 +58,10 @@ function parseMessageForScriptureRef(message) {
                     name: scriptureName
                 })
             }
-            
-            /*var startIndices = indicesOf(htmlStr.toLowerCase(),RegExp('\\b'+scriptureName+' \\d'))
-            var addedChars = 0
-            startIndices.forEach(startInd => {
-                var startInd = startInd + addedChars
-                var ref = htmlStr.slice(startInd+nameLength+1).split(/[^,0-9:-]/)[0]
-                var splitRef = ref.split(':')
-                var chapter = splitRef[0]
-                var chapterInt = parseInt(chapter)
-                var versesRef = splitRef[1]
-
-                ref = chapter + ':' + (versesRef === undefined ? '' : versesRef)
-
-                if (
-                    isNaN(chapterInt) || 
-                    chapterInt.toString() !== chapter ||
-                    chapterInt < 1 ||
-                    chapterInt > scripture.chapters
-                ) return
-
-                var href = 'https://churchofjesuschrist.org/study/scriptures' + scripture.path + chapterInt
-                var trailingChars = 0
-                if (versesRef === '') trailingChars -= 1
-                if (/[,0-9-]/.test(versesRef)) {
-                    var verses = versesRef.split(/[,-]/)
-                    var validVerses = verses.reduce((prev,verseStr) => {
-                        var verse = parseInt(verseStr)
-                        if (verseStr === '') {
-                            trailingChars -= 1
-                            return prev
-                        }
-                        return prev && !isNaN(verse) && verse > 0 && verse <= scripture.verses[chapterInt-1]
-                    },true)
-                    if (!validVerses) return
-                    href += '.' + versesRef + '#' + verses[0]
-                }
-
-                var endInd = startInd + nameLength + 1 + ref.length + trailingChars
-                htmlStr = insert(
-                    htmlStr,
-                    '</a>' ,
-                    endInd
-                )
-                htmlStr = insert(
-                    htmlStr,
-                    '<a href="' + href + '" target="_blank">' ,
-                    startInd
-                )
-
-                addedChars += href.length + 31
-            })*/
         })
     })
 
     refs = refs.sort((a,b) => b.match.index - a.match.index)
-    if (refs.length > 0) console.log(htmlStr, refs)
     refs.forEach((ref, i) => {
         var match = ref.match
         var matchStr = match[0]
@@ -145,17 +91,24 @@ function parseMessageForScriptureRef(message) {
         if (verses !== undefined && verses !== '') {
             var versesRefLength = verses.length
             
+            var maxVerse = ref.scripture.verses[chapterInt - 1]
             var verseNums = verses.split(/[-,]/)
-            var validVerses = verseNums.reduce((valid, verseStr) => {
-                if (verseStr === '') {
-                    versesRefLength -= 1
-                    return valid
-                }
+            var validVerses = true
+            verseNums.forEach(verseStr => {
                 var verse = parseInt(verseStr)
-                return valid && verse > 0 && verse <= ref.scripture.verses[chapterInt - 1]
-            }, true)
+                if (
+                    !validVerses || 
+                    isNaN(verse) || 
+                    verse < 1 || 
+                    verse > maxVerse
+                ) {
+                    versesRefLength -= verseStr.length + 1
+                    validVerses = false
+                }
+            })
             
-            if (validVerses) {
+            var versesRef = verses.substr(0, versesRefLength)
+            if (versesRef.length > 0) {
                 href += '.' + verses.substr(0, versesRefLength) + '#' + verseNums[0]
                 refLength -= (verses.length - versesRefLength)
             } else {
@@ -165,8 +118,6 @@ function parseMessageForScriptureRef(message) {
         
         htmlStr = insert(htmlStr, '</a>', match.index + refLength)
         htmlStr = insert(htmlStr, '<a href="' + href + '" target="_blank">', match.index)
-
-        console.log(matchStr, match.index, numRef, chapter, verses)
     })
 
     return htmlStr
@@ -174,20 +125,6 @@ function parseMessageForScriptureRef(message) {
 
 function insert(str,insertion,index) {
     return str.substr(0,index) + insertion + str.substr(index)
-}
-
-function indicesOf(str,search) {
-    var indices = []
-    var resStr = str
-    var newMatch
-    var actualIndex = 0
-    while ((newMatch = resStr.match(search)) !== null) {
-        var afterOccurence = newMatch.index + newMatch[0].length
-        indices.push(actualIndex + newMatch.index)
-        resStr = resStr.substr(afterOccurence)
-        actualIndex += afterOccurence
-    }
-    return indices.sort((a,b) => a-b)
 }
 
 var scriptures = [{
