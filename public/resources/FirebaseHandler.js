@@ -150,7 +150,6 @@ class FirebaseHandler {
                         var messageObj = {
                             from: messageData.from,
                             text: messageData.text,
-                            html: parseMessageForScriptureRef(messageData.text),
                             sent: messageData.sent.toDate()
                         }
 
@@ -401,7 +400,6 @@ class FirebaseHandler {
                     messages[messageId] = {
                         from: messageData.from,
                         text: messageData.text,
-                        html: parseMessageForScriptureRef(messageData.text),
                         sent: messageData.sent.toDate()
                     }
                 })
