@@ -155,6 +155,7 @@ class FirebaseHandler {
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = messageObj
                         messageObj.id = snapshot.id
+                        messageObj.html = parseMessageForScriptureRef(messageData.text)
                         this.dataObj.groups[groupId].messagesArr.push(messageObj)
 
                         this.newMessageInGroup(groupId)
