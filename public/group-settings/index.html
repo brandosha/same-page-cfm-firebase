@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="/resources/loader.css">
     <link rel="stylesheet" href="/resources/toolbar.css">
+    <link rel="stylesheet" href="/resources/avatar.css">
     <link rel="stylesheet" href="/resources/dark.css">
     <link rel="stylesheet" href="style.css">
   </head>
@@ -78,9 +79,16 @@
       <h4>
         Group Members
       </h4>
-      <div v-for="(memberData, userId) in groupMemberData" class="d-flex align-content-center justify-content-between p-2 border-top">
-        <div style="font-size: 1.25em">
-          {{ firebaseData.users[userId].name }}
+      <div v-for="(memberData, userId) in groupMemberData" class="d-flex align-items-center justify-content-between p-2 border-top">
+        <div class="d-flex align-items-center" style="font-size: 1.25em">
+          <img
+            v-if="firebaseData.users[userId].avatar"
+            class="avatar"
+            :src="firebaseData.users[userId].avatar"
+            :alt="firebaseData.users[userId].name"
+          >
+          <div v-else class="avatar text-monospace">{{ initials(userId) }}</div>
+          <div>{{ firebaseData.users[userId].name }}</div>
         </div>
         <div class="btn-group">
           <button

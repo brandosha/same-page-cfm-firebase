@@ -195,6 +195,15 @@ async function handleUI() {
                     validEmail: false,
                     key: ++this.minKey
                 })
+            },
+            initials: function(userId) {
+                var name = this.firebaseData.users[userId].name
+                var names = name.split(' ')
+                if (names.length === 1) {
+                    return name.substr(0, 1).toUpperCase()
+                } else {
+                    return (names[0].substr(0, 1) + names[names.length - 1].substr(0, 1)).toUpperCase()
+                }
             }
         },
         computed: {
