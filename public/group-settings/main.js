@@ -185,6 +185,7 @@ async function handleUI() {
                 loader.show()
                 firestore.doc('groups/' + this.groupId + '/members/' + myUid).delete()
                 .then(_ => {
+                    localStorage.removeItem(this.groupId + '_messages')
                     location.href = '/home/#left-group:' + this.groupId
                 })
             },
