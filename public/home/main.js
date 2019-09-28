@@ -69,6 +69,16 @@ async function handleUI() {
             formatDate: function(index) {
                 var message = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
                 if (!(message.sent && message.sent.toLocaleString)) return
+
+                var day = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24))
+                var messageDay = Math.floor(message.sent.getTime() / (1000 * 60 * 60 * 24))
+                console.log('today:', day, 'messsage:', messageDay)
+                if (day === messageDay) {
+                    return '<b>Today</b> at ' + this.formatTime(message)
+                } else if (day === messageDay + 1) {
+                    return '<b>Yesterday</b> at ' + this.formatTime(message)
+                }
+
                 var dateSettings = {
                     weekday: 'long',
                     month: 'long',
@@ -77,7 +87,7 @@ async function handleUI() {
                 if (message.sent.getYear() !== new Date().getYear()) dateSettings.year = 'numeric'
 
                 var date = message.sent.toLocaleString(undefined, dateSettings)
-                return '<strong>' + date + '</strong> '
+                return '<b>' + date + '</b> at ' + this.formatTime(message)
             },
             initials: function(message) {
                 var name = this.firebaseData.users[message.from].name
