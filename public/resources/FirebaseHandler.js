@@ -221,6 +221,10 @@ class FirebaseHandler {
 
         this.dataObj.groupArr.splice(updateIndex, 1)
         this.dataObj.groupArr.unshift(updatedGroup)
+
+        if (typeof this.newMessageListener === 'function') {
+            this.newMessageListener(groupId)
+        }
     }
 
     async refreshGroups() {

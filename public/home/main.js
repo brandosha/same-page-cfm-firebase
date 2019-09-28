@@ -118,13 +118,25 @@ async function handleUI() {
         }
     })
 
+    firebaseHandler.newMessageListener = function(groupId) {
+        var messages = document.getElementById('messages')
+        if (
+            groupId === mainUI.groupId && 
+            messages.scrollHeight - messages.scrollTop === messages.clientHeight
+        ) {
+            $('#messages').stop().animate({
+                scrollTop: $('#messages')[0].scrollHeight
+            });
+        }
+    }
+
     $(window).on('hashchange', event => {
         var newHash = window.location.hash.slice(1)
         mainUI.groupId = newHash
         mainUI.$nextTick(_ => {
             handleFullPageLinks()
             if (!mainUI.isValidGroup) return
-            $('#messages').scrollTop($('#messages')[0].scrollHeight);
+            $('#messages').scrollTop($('#messages')[0].scrollHeight)
         })
     })
 }
