@@ -30,7 +30,7 @@ async function handleUI() {
 
     var firestore = firebase.firestore()
     var functions = firebase.functions()
-    functions.useFunctionsEmulator('http://localhost:5001')
+    // functions.useFunctionsEmulator('http://localhost:5001')
     var searchEmailAddresses = functions.httpsCallable('searchEmailAddresses')
 
     Vue.component('member-input', {
