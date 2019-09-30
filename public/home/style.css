@@ -33,8 +33,8 @@ body { overflow: hidden; }
 }
 
 .message-container { max-width: 75%; }
-.message-row div .dropdown .message-options { display: none; }
-.message-row:hover div .dropdown .message-options { display: inline; }
+.message-row div .dropdown { display: none; }
+.message-row:hover div .dropdown { display: inline-block; }
 
 .message {
     border-radius: 10px;

@@ -39,7 +39,6 @@ async function handleUI() {
                 })
             },
             deleteMessage: function(message) {
-                console.log('Deleting message with id:', message.id)
                 var messageId = message.id
                 firebaseHandler.deleteMessage(this.groupId, messageId)
             },
@@ -72,7 +71,6 @@ async function handleUI() {
 
                 var day = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24))
                 var messageDay = Math.floor(message.sent.getTime() / (1000 * 60 * 60 * 24))
-                console.log('today:', day, 'messsage:', messageDay)
                 if (day === messageDay) {
                     return '<b>Today</b> at ' + this.formatTime(message)
                 } else if (day === messageDay + 1) {

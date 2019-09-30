@@ -144,7 +144,7 @@
                   <span class="timestamp text-monospace" v-html="formatTime(message)"></span>
                   <span
                     v-if="message.from === firebaseData.uid || firebaseData.groups[groupId].members[firebaseData.uid].isManager"
-                    class="dropdown d-inline-block"
+                    class="dropdown"
                   >
                     <a
                       class="message-options text-dark nav-link p-0"
