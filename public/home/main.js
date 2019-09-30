@@ -205,6 +205,5 @@ function resizeFullHeight() {
 }
 resizeFullHeight()
 $(window).resize(_ => {
-    if (fullPage) setTimeout(resizeFullHeight, 500)
-    else resizeFullHeight()
+    setTimeout(resizeFullHeight, 100)
 })
