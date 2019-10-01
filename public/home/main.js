@@ -28,11 +28,11 @@ async function handleUI() {
         },
         methods: {
             sendMessage: function() {
-                var messageText = this.newMessage.trim()
+                var messageText = this.newMessage//.trim()
                 this.newMessage = ''
+                if (!this.isValidGroup) return
                 firebaseHandler.sendMessage(messageText, this.groupId)
                 .then(_ => {
-                    if (!this.isValidGroup) return
                     $('#messages').stop().animate({
                         scrollTop: $('#messages')[0].scrollHeight
                     });
@@ -57,16 +57,17 @@ async function handleUI() {
                 }).replace(' ', '&nbsp;')
             },
             shouldAddDate: function(index) {
+                if (index === 0) { return true }
+                var prevMessage = this.firebaseData.groups[this.groupId].messagesArr[index - 1]
                 var thisMessage = this.firebaseData.groups[this.groupId].messagesArr[index]
-                var nextMessage = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
-                if (thisMessage && thisMessage.sent && nextMessage && nextMessage.sent) {
-                    var secondsBetween = nextMessage.sent.getTime() - thisMessage.sent.getTime()
+                if (prevMessage.sent && thisMessage.sent) {
+                    var secondsBetween = thisMessage.sent.getTime() - prevMessage.sent.getTime()
                     return secondsBetween > 30 * 60 * 1000
                 }
                 return false
             },
             formatDate: function(index) {
-                var message = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
+                var message = this.firebaseData.groups[this.groupId].messagesArr[index]
                 if (!(message.sent && message.sent.toLocaleString)) return
 
                 var day = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24))
@@ -95,6 +96,21 @@ async function handleUI() {
                 } else {
                     return (names[0].substr(0, 1) + names[names.length - 1].substr(0, 1)).toUpperCase()
                 }
+            },
+            expandTextarea: function() {
+                var messageBox = $('#message-textarea')
+                if (messageBox[0].scrollHeight !== messageBox.height()) {
+                    messageBox.height(1)
+                    messageBox.height('calc(' + messageBox[0].scrollHeight + 'px + 0.15em)')
+                    $('#messages').css('padding-bottom', 'calc(' + messageBox.height() + 'px + 3.35em)')
+                }
+            },
+            messageInputEnter: function(event) {
+                if (event.which === 13 && !event.shiftKey) {
+                    event.preventDefault()
+                    this.sendMessage()
+                    setTimeout(this.expandTextarea, 100)
+                }
             }
         },
         computed: {
@@ -115,10 +131,14 @@ async function handleUI() {
                 return ''
             }
         },
+        watch: {
+            newMessage: function() { this.expandTextarea() }
+        },
         created: function() {
             this.$nextTick(_ => {
                 if (this.isValidGroup) {
                     $('#messages').scrollTop($('#messages')[0].scrollHeight);
+                    this.expandTextarea()
                 }
                 handleFullPageLinks()
                 loader.hide()
@@ -145,11 +165,12 @@ async function handleUI() {
             handleFullPageLinks()
             if (!mainUI.isValidGroup) return
             $('#messages').scrollTop($('#messages')[0].scrollHeight)
+            mainUI.expandTextarea()
         })
     })
 }
 
-var debug = new Vue({
+/*var debug = new Vue({
     el: '#debug',
     data: {
         debugging: false,
@@ -198,7 +219,7 @@ $(document).mousemove(event => {
         $('#debug-body').height(newHeight)
         $('#debug-top').css('bottom', newHeight + 'px')
     }
-})
+})*/
 
 function resizeFullHeight() {
     $('.window-height').outerHeight(window.innerHeight)
