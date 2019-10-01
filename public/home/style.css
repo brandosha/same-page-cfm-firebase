@@ -49,7 +49,6 @@ body { overflow: hidden; }
 .timestamp {
     text-align: right;
     font-size: 0.7em;
-    padding-left: 1em;
 }
 .date {
     text-align: center;

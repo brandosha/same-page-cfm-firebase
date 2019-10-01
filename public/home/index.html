@@ -124,15 +124,20 @@
               v-if="message !== undefined"
               class="py-1 "
             >
-              <div class="d-flex align-items-center justify-content-between message-row">
-                <div class="d-flex align-items-center message-container">
+              <div class="d-flex align-items-center justify-content-between message-row" :class="{ 'flex-row-reverse': message.from === firebaseData.uid }">
+                <div class="d-flex align-items-center message-container" :class="{ 'flex-row-reverse': message.from === firebaseData.uid }">
                   <img
                     v-if="firebaseData.users[message.from].avatar"
                     class="avatar"
                     :src="firebaseData.users[message.from].avatar"
                     :alt="firebaseData.users[message.from].name"
+                    :class="message.from === firebaseData.uid ? 'ml-2' : 'mr-2'"
                   >
-                  <div v-else class="avatar text-monospace">{{ initials(message) }}</div>
+                  <div
+                    v-else
+                    class="avatar text-monospace"
+                    :class="message.from === firebaseData.uid ? 'ml-2' : 'mr-2'"
+                  >{{ initials(message) }}</div>
     
                   <div
                     v-html="message.html"
@@ -140,9 +145,9 @@
                     :class="message.from === firebaseData.uid ? 'message-from-me' : 'message-from-other'"
                   ></div>
                 </div>
-                <div class="text-center">
-                  <span class="timestamp text-monospace" v-html="formatTime(message)"></span>
-                  <span
+                <div class="text-center d-flex align-items-center" :class="{ 'flex-row-reverse': message.from === firebaseData.uid }">
+                  <div class="timestamp text-monospace d-inline-block mx-1" v-html="formatTime(message)"></div>
+                  <div
                     v-if="message.from === firebaseData.uid || firebaseData.groups[groupId].members[firebaseData.uid].isManager"
                     class="dropdown"
                   >
@@ -161,7 +166,7 @@
                         @click.prevent="deleteMessage(message)"
                       >Delete</a>
                     </div>
-                  </span>
+                  </div>
                 </div>
               </div>
               <div v-if="shouldAddDate(index)" class="date" v-html="formatDate(index)"></div>
