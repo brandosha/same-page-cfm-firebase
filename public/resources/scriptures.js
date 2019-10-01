@@ -49,7 +49,8 @@ function parseMessageForScriptureRef(message) {
     var refs = []
     scriptures.forEach(scripture => {
         scripture.names.forEach(scriptureName => {
-            var refMatcher = new RegExp('\\b'+scriptureName+' [0-9]{1,3}(:[0-9][0-9,-]*)?', 'g')
+			scriptureName = scriptureName.replace('.', '\\.')
+            var refMatcher = new RegExp('\\b'+scriptureName+'( [0-9]{1,3}(:[0-9][0-9,-]*)?)?\\b', 'g')
             var match;
             while (match = refMatcher.exec(htmlStr.toLowerCase())) {
                 refs.unshift({
@@ -73,22 +74,30 @@ function parseMessageForScriptureRef(message) {
             }
         }
 
-        var numRef = matchStr.substr(ref.name.length + 1)
-        var [chapter, verses] = numRef.split(':')
-
-        var chapterInt = parseInt(chapter)
-        if (
-            isNaN(chapterInt) ||
-            chapterInt.toString() !== chapter ||
-            chapterInt < 1 ||
-            chapterInt > ref.scripture.chapters
-        ) return
-
-        var href = 'https://churchofjesuschrist.org/study/scriptures' + ref.scripture.path + chapterInt
+		var href = 'https://churchofjesuschrist.org/study/scriptures' + ref.scripture.path
         var refLength = matchStr.length
-        if (verses === '') refLength -= 1
+		
+		if (ref.name.length !== matchStr.length) {
+			var numRef = matchStr.substr(ref.name.length + 1)
+			var [chapter, verses] = numRef.split(':')
 
-        if (verses !== undefined && verses !== '') {
+			var chapterInt = parseInt(chapter)
+			if (
+				isNaN(chapterInt) ||
+				chapterInt.toString() !== chapter ||
+				chapterInt < 1 ||
+				chapterInt > ref.scripture.chapters
+			) {
+				href += '1'
+				refLength = ref.name.length
+			} else {
+				href += chapterInt
+				if (verses === '') refLength -= 1
+			}
+			
+		} else { href += '1' }
+
+        if (verses !== undefined && verses !== '' && refLength !== ref.name.length) {
             var versesRefLength = verses.length
             
             var maxVerse = ref.scripture.verses[chapterInt - 1]
