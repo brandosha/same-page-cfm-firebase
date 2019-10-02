@@ -22,8 +22,9 @@ var myUid
 var groupId
 var firebaseHandler
 
-
 async function handleUI() {
+    $('#done-link').attr('href', '/home/#' + groupId)
+
     await firebaseHandler.refreshGroups()
     await firebaseHandler.refreshGroupMembers(groupId)
     await firebaseHandler.refreshUsers()

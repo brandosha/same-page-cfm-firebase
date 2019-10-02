@@ -243,7 +243,6 @@ class FirebaseHandler {
             if (!hash.includes('created-group')) return new Promise(resolve => resolve())
             var newGroup = hash.split(':')[1]
             if (newGroup === undefined) return new Promise(resolve => resolve())
-            location.hash = ''
 
             while (
                 tokenInfo.claims.groups === undefined ||
@@ -254,6 +253,7 @@ class FirebaseHandler {
                 tokenInfo = await self.auth.currentUser.getIdTokenResult()
                 if (tokenInfo.claims.groups !== undefined) {
                     groupIds = Object.keys(tokenInfo.claims.groups)
+                    location.hash = newGroup
                 }
             }
         }
