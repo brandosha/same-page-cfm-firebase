@@ -70,11 +70,11 @@ async function handleUI() {
                 var message = this.firebaseData.groups[this.groupId].messagesArr[index]
                 if (!(message.sent && message.sent.toLocaleString)) return
 
-                var day = Math.floor(new Date().getTime() / (1000 * 60 * 60 * 24))
-                var messageDay = Math.floor(message.sent.getTime() / (1000 * 60 * 60 * 24))
-                if (day === messageDay) {
+                var today = Math.round(new Date().getTime() / (1000 * 60 * 60 * 24))
+                var messageDay = Math.round(message.sent.getTime() / (1000 * 60 * 60 * 24))
+                if (messageDay === today) {
                     return '<b>Today</b> at ' + this.formatTime(message)
-                } else if (day === messageDay + 1) {
+                } else if (messageDay === today - 1) {
                     return '<b>Yesterday</b> at ' + this.formatTime(message)
                 }
 
