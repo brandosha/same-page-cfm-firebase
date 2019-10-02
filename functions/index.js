@@ -204,3 +204,38 @@ exports.searchEmailAddresses = functions.https.onCall( async (data, context) => 
     var searchResults = await Promise.all(promises)
     return searchResults
 })
+
+exports.deleteGroup = functions.https.onCall( async (data, context) => {
+    const groupId = data.groupId
+
+    if (context.auth === undefined) {
+        throw new functions.https.HttpsError('permission-denied', 'You must be logged in to complete this action')
+    }
+    if (groupId === undefined || groupId === null) {
+        throw new functions.https.HttpsError('invalid-argument', 'No group id was supplied')
+    }
+
+    const permissionToSearch = await isGroupManager(groupId, context.auth)
+    if (!permissionToSearch) { 
+        throw new functions.https.HttpsError('permission-denied', 'You are not a manger of this group')
+    }
+
+    var batch = firestore.batch()
+
+    var messageRefs = await firestore.collection('groups/' + groupId + '/messages').listDocuments()
+    var memberRefs = await firestore.collection('groups/' + groupId + '/members').listDocuments()
+    var eventRefs = await firestore.collection('groups/' + groupId + '/events').listDocuments()
+
+    var allRefs = (messageRefs).concat(memberRefs).concat(eventRefs)
+    allRefs.forEach(ref => {
+        batch.delete(ref)
+    })
+    batch.delete(firestore.doc('groups/' + groupId))
+
+    batch.commit()
+
+    return {
+        result: allRefs.map(val => val.path),
+        groupId: groupId
+    }
+})

@@ -35,7 +35,19 @@
   </head>
   <body>
     <div id="vue-main" class="container p-3 mt-5">
-      <div class="d-flex justify-content-end">
+      <div
+        class="d-flex"
+        :class="editing ? 'justify-content-between' : 'justify-content-end'"
+      >
+        <button
+          v-if="canEdit && editing"
+          type="button"
+          class="btn btn-danger"
+          data-toggle="modal"
+          data-target="#delete-confirm-modal"
+        >
+        Delete group
+        </button>
         <button
           v-if="canEdit"
           type="button"
@@ -50,7 +62,7 @@
           type="button"
           class="btn btn-danger"
           data-toggle="modal"
-          data-target="#confirm-modal"
+          data-target="#leave-confirm-modal"
         >
           Leave group
         </button>
@@ -80,7 +92,10 @@
       <h4>
         Group Members
       </h4>
-      <div v-for="(memberData, userId) in groupMemberData" class="d-flex align-items-center justify-content-between p-2 border-top">
+      <div
+        v-for="(memberData, userId) in groupMemberData"
+        class="d-flex align-items-center justify-content-between p-2 border-top"
+      >
         <div class="d-flex align-items-center" style="font-size: 1.25em">
           <img
             v-if="firebaseData.users[userId].avatar"
@@ -159,13 +174,13 @@
 
     <nav class="d-flex p-1 align-items-center justify-content-end" id="toolbar">
       <div>
-        <a class="nav-link text-dark h5 m-0" href="/home">
+        <a id="done-link" class="nav-link text-dark h5 m-0" href="/home">
           Done
         </a>
       </div>
     </nav>
 
-    <div class="modal fade" id="confirm-modal" tabindex="-1">
+    <div class="modal fade" id="leave-confirm-modal" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
@@ -176,6 +191,23 @@
           </div>
           <div class="modal-footer">
             <button class="btn btn-danger" onclick="mainUI.leaveGroup()">Leave</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="delete-confirm-modal" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Are you sure you want to delete this group?</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span>&times;</span>
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-danger" onclick="mainUI.deleteGroup()">Delete</button>
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
           </div>
         </div>

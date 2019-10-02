@@ -31,8 +31,8 @@ async function handleUI() {
 
     var firestore = firebase.firestore()
     var functions = firebase.functions()
-    // functions.useFunctionsEmulator('http://localhost:5001')
-    var searchEmailAddresses = functions.httpsCallable('searchEmailAddresses')
+    // Don't forget to remove or comment!!
+    functions.useFunctionsEmulator('http://localhost:5001')
 
     Vue.component('member-input', {
         props: ['member', 'displayFeedback'],
@@ -96,10 +96,6 @@ async function handleUI() {
         }
     })
 
-    function copy(obj) {
-        return JSON.parse(JSON.stringify(obj))
-    }
-
     var deletedMembers = { }
     for (const userId in firebaseHandler.dataObj.groups[groupId].members) {
         deletedMembers[userId] = false
@@ -111,7 +107,7 @@ async function handleUI() {
             firebaseData: firebaseHandler.dataObj,
             groupId: groupId,
             groupName: firebaseHandler.dataObj.groups[groupId].name,
-            groupMemberData: copy(firebaseHandler.dataObj.groups[groupId].members),
+            groupMemberData: copyOf(firebaseHandler.dataObj.groups[groupId].members),
             deletedMembers: deletedMembers,
             canEdit: firebaseHandler.dataObj.groups[groupId].members[myUid].isManager,
             editing: false,
@@ -164,6 +160,7 @@ async function handleUI() {
 
                 var emailUids = { data: [] }
                 if (emails.length > 0) {
+                    var searchEmailAddresses = functions.httpsCallable('searchEmailAddresses')
                     emailUids = await searchEmailAddresses({
                         groupId: groupId,
                         emailAddresses: emails
@@ -186,6 +183,15 @@ async function handleUI() {
                 loader.show()
                 firestore.doc('groups/' + this.groupId + '/members/' + myUid).delete()
                 .then(_ => {
+                    localStorage.removeItem(this.groupId + '_messages')
+                    location.href = '/home/#left-group:' + this.groupId
+                })
+            },
+            deleteGroup: function() {
+                loader.show()
+                
+                var deleteGroup = functions.httpsCallable('deleteGroup')
+                deleteGroup({groupId: groupId}).then(_ => {
                     localStorage.removeItem(this.groupId + '_messages')
                     location.href = '/home/#left-group:' + this.groupId
                 })
@@ -239,7 +245,7 @@ async function handleUI() {
         watch: {
             editing: function() {
                 if (!this.editing) {
-                    this.groupMemberData = copy(this.firebaseData.groups[groupId].members)
+                    this.groupMemberData = copyOf(this.firebaseData.groups[groupId].members)
                     this.memberInputs = []
                     this.groupName = firebaseHandler.dataObj.groups[groupId].name
                     for (const userId in this.deletedMembers) {
