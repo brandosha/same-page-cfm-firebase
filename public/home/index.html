@@ -172,10 +172,10 @@
               </div>
             </div>
           </div>
-          <div class="container-fluid fixed-bottom">
+          <div class="container-fluid fixed-bottom" style="pointer-events: none;">
             <div class="row">
               <div class="col-sm-4 invisible"></div>
-              <div id="message-input" class="col-sm-8">
+              <div id="message-input" class="col-sm-8" style="pointer-events: auto;">
                 <form @submit.prevent="sendMessage">
                   <div
                     class="row form-group align-items-center mx-0"
