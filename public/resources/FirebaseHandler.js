@@ -111,11 +111,15 @@ class FirebaseHandler {
     createGroupArray() {
         var groupArr = Object.keys(this.dataObj.groups).map(groupId => {
             var group = this.dataObj.groups[groupId]
-            return {
+            var groupObj = {
                 id: groupId,
-                name: group.name,
-                lastMessage: group.messagesArr[group.messagesArr.length - 1]
+                name: group.name
             }
+            if (group.messagesArr && group.messagesArr.length > 0) {
+                groupObj.lastMessage = group.messagesArr[group.messagesArr.length - 1]
+            }
+
+            return groupObj
         })
 
         groupArr = groupArr.sort((a, b) => {
@@ -240,9 +244,9 @@ class FirebaseHandler {
         var self = this
         async function checkMatchingGroups() {
             var hash = location.hash
-            if (!hash.includes('created-group')) return new Promise(resolve => resolve())
+            if (!hash.includes('created-group')) return
             var newGroup = hash.split(':')[1]
-            if (newGroup === undefined) return new Promise(resolve => resolve())
+            if (newGroup === undefined) return
 
             while (
                 tokenInfo.claims.groups === undefined ||
@@ -263,9 +267,33 @@ class FirebaseHandler {
         for (const groupId in this.dataObj.groups) {
             groupsDeleted[groupId] = true
         }
-        var promises = groupIds.map(groupId => {
+        /*var promises = */groupIds.forEach(groupId => {
             groupsDeleted[groupId] = false
-            return this.firestore.doc('groups/' + groupId).get()
+            self.listenerUnsubscribers.push(
+                self.firestore.doc('groups/' + groupId)
+                .onSnapshot(snapshot => {
+                    if (snapshot.exists) {
+                        var groupData = snapshot.data()
+                        if (groupData === undefined) throw new Error("Group " + groupId + " doesn't exist")
+                        if (groupId in self.dataObj.groups) {
+                            self.dataObj.groups[groupId].name = groupData.name
+                            if (self.dataObj.groupArr) {
+                                self.createGroupArray()
+                            }
+                        } else {
+                            self.dataObj.groups[groupId] = {
+                                name: groupData.name
+                            }
+                        }
+                    } else {
+                        location.hash = ''
+                        delete self.dataObj.groups[groupId]
+                        self.createGroupArray()
+                    }
+                })
+            )
+            
+            /*return this.firestore.doc('groups/' + groupId).get()
                 .then(snapshot => {
                     var groupData = snapshot.data()
                     if (groupData === undefined) throw new Error("Group " + groupId + " doesn't exist")
@@ -279,9 +307,10 @@ class FirebaseHandler {
                 })
                 .catch(_ => {
                     delete this.dataObj.groups[groupId]
-                })
+                })*/
         })
-        await Promise.all(promises)
+        // console.log(promises)
+        // await Promise.all(promises)
 
         for (const groupId in this.dataObj.groups) {
             if(groupsDeleted[groupId]) {

@@ -177,7 +177,7 @@ async function handleUI() {
                 })
 
                 await Promise.all(promises)
-                location.href = '/home'
+                location.href = '/home/#' + this.groupId
             },
             leaveGroup: function() {
                 loader.show()
