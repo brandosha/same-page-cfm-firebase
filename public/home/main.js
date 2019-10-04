@@ -88,6 +88,20 @@ async function handleUI() {
                 var date = message.sent.toLocaleString(undefined, dateSettings)
                 return '<b>' + date + '</b> at ' + this.formatTime(message)
             },
+            shouldAddName: function(index) {
+                var message = this.firebaseData.groups[this.groupId].messagesArr[index]
+                var nextMessage = this.firebaseData.groups[this.groupId].messagesArr[index + 1]
+
+                return (
+                    message && 
+                    message.from !== this.firebaseData.uid && 
+                    (
+                        !nextMessage || 
+                        nextMessage.from !== message.from ||
+                        this.shouldAddDate(index + 1)
+                    )
+                )
+            },
             initials: function(message) {
                 var name = this.firebaseData.users[message.from].name
                 var names = name.split(' ')

@@ -170,6 +170,7 @@
                   </div>
                 </div>
               </div>
+              <div v-if="shouldAddName(index)"><small>{{ firebaseData.users[message.from].name }}</small></div>
             </div>
           </div>
           <div class="container-fluid fixed-bottom" style="pointer-events: none;">
