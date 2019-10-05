@@ -97,7 +97,7 @@ class FirebaseHandler {
                 from: messageObj.from,
                 sent: messageObj.sent,
                 text: messageObj.text,
-                html: parseMessageForScriptureRef(messageObj.text)
+                html: parseMessageForScriptureRef(linkUrls(messageObj.text))
             })
         }
 
@@ -159,7 +159,7 @@ class FirebaseHandler {
 
                         this.dataObj.groups[groupId].messagesObj[snapshot.id] = messageObj
                         messageObj.id = snapshot.id
-                        messageObj.html = parseMessageForScriptureRef(messageData.text)
+                        messageObj.html = parseMessageForScriptureRef(linkUrls(messageData.text))
                         this.dataObj.groups[groupId].messagesArr.push(messageObj)
 
                         this.newMessageInGroup(groupId)
@@ -464,7 +464,7 @@ class FirebaseHandler {
         this.dataObj.groups[groupId].messagesArr.push({
             from: this.dataObj.uid,
             text: text,
-            html: parseMessageForScriptureRef(text)
+            html: parseMessageForScriptureRef(linkUrls(text))
         })
 
         var newDoc = await this.firestore.collection('groups/' + groupId + '/messages').add(messageObj)
@@ -506,4 +506,31 @@ function getLocalObj(key) {
 
 function copyOf(obj) {
     return JSON.parse(JSON.stringify(obj))
+}
+
+function linkUrls(message) {
+    var htmlStr = message
+    htmlStr = htmlStr.replace(/</g,'&lt;').replace(/>/g,'&gt;')
+
+    var urlFinder = /(http:|https:)\/\/[a-zA-z0-9&#=.\/\-?_]+/g
+    var matches = [], match
+    while (match = urlFinder.exec(htmlStr)) { matches.push(match) }
+
+    matches.forEach(match => {
+        var matchStr = match[0]
+        console.log(matchStr, urlFinder.lastIndex)
+
+        htmlStr = insert(
+            htmlStr,
+            '</a>',
+            match.index + matchStr.length,
+        )
+        htmlStr = insert(
+            htmlStr,
+            '<a href="' + matchStr + '">',
+            match.index,
+        )
+    })
+
+    return htmlStr
 }

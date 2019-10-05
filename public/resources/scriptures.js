@@ -44,14 +44,13 @@ getChapterLengths(0)
 
 function parseMessageForScriptureRef(message) {
     var htmlStr = message
-    htmlStr = htmlStr.replace(/</g,'&lt;').replace(/>/g,'&gt;')
     
     var refs = []
     scriptures.forEach(scripture => {
         scripture.names.forEach(scriptureName => {
 			scriptureName = scriptureName.replace('.', '\\.')
             var refMatcher = new RegExp('\\b'+scriptureName+'( [0-9]{1,3}(:[0-9][0-9,-]*)?)?\\b', 'g')
-            var match;
+            var match
             while (match = refMatcher.exec(htmlStr.toLowerCase())) {
                 refs.unshift({
                     match: match,
