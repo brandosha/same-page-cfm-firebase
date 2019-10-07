@@ -513,12 +513,9 @@ function linkUrls(message) {
     htmlStr = htmlStr.replace(/</g,'&lt;').replace(/>/g,'&gt;')
 
     var urlFinder = /(http:|https:)\/\/[a-zA-z0-9&#=.\/\-?_]+/g
-    var matches = [], match
-    while (match = urlFinder.exec(htmlStr)) { matches.push(match) }
-
-    matches.forEach(match => {
+    var temp = htmlStr, match
+    while (match = urlFinder.exec(temp)) {
         var matchStr = match[0]
-        console.log(matchStr, urlFinder.lastIndex)
 
         htmlStr = insert(
             htmlStr,
@@ -530,7 +527,7 @@ function linkUrls(message) {
             '<a href="' + matchStr + '">',
             match.index,
         )
-    })
+    }
 
     return htmlStr
 }
